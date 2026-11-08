@@ -1,0 +1,81 @@
+/* Dedicated small-card layout: no full-size sections hidden behind a clipped container. */
+.embedded .card-stage .tile {
+  display:grid; grid-template-rows:20px minmax(0,1fr) 18px; gap:6px;
+  height:100dvh; min-height:0; width:100%; padding:12px; border:0; border-radius:0;
+  box-shadow:none; overflow:visible; font-size:11px; line-height:1.35;
+}
+.tile-header { display:flex; align-items:center; gap:6px; min-width:0; }
+.tile-name { font-size:12px; line-height:18px; font-weight:650; margin:0; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tile-origin { font-size:10px; line-height:14px; color:var(--ui-secondary); background:var(--ui-fill); border-radius:3px; padding:0 3px; flex-shrink:0; }
+.tile-header>.tile-status { margin-left:auto; }
+.embedded .tile .tile-status { font-size:11px; line-height:16px; padding:2px 6px; gap:0; border-radius:5px; white-space:nowrap; }
+.tile-body { display:grid; grid-template-columns:76px minmax(0,1fr); align-items:center; gap:12px; min-width:0; min-height:0; }
+.embedded .tile .tile-cover { display:flex; min-height:0; height:76px; max-height:76px; padding:4px; border-radius:8px; gap:0; }
+.embedded .tile .cover-image { height:68px; }
+.tile .cover-caption,.tile .cover-placeholder-icon,.tile .cover>span { display:none; }
+.tile .cover strong { font-size:11px; }
+.tile-info { min-width:0; display:grid; gap:3px; align-content:center; }
+.embedded .tile .tile-task { font-size:12px; line-height:17px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:550; }
+.tile-alert { color:#a64d34; }
+.tile-hero { display:flex; align-items:center; justify-content:space-between; gap:6px; min-width:0; }
+.embedded .tile .tile-progress { display:flex; align-items:baseline; gap:3px; min-width:0; }
+.embedded .card-stage .tile .tile-progress-value { font-size:32px; line-height:38px; letter-spacing:-1px; font-weight:550; }
+.embedded .tile .tile-percent { font-size:12px; line-height:16px; }
+.tile-remaining { display:flex; gap:6px; align-items:baseline; min-width:0; margin:0; line-height:15px; white-space:nowrap; }
+.tile-remaining-label { font-size:10px; color:var(--ui-secondary); }
+.tile-remaining-value { font-size:11px; font-weight:550; overflow:hidden; text-overflow:ellipsis; }
+.tile-wide .tile-remaining { flex-direction:column; gap:0; align-items:flex-end; }
+.tile-track { height:3px; background:var(--ui-fill); border-radius:3px; overflow:hidden; }
+.tile-fill { display:block; height:100%; background:var(--ui-primary); border-radius:3px; }
+.tile-metrics { display:flex; justify-content:space-between; gap:8px; min-width:0; line-height:15px; }
+.tile-metric { display:flex; flex-direction:column; min-width:0; }
+.tile-metric span { font-size:10px; color:var(--ui-secondary); }
+.tile-metric strong { font-size:11px; font-weight:550; white-space:nowrap; }
+.tile-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; border-top:1px solid var(--ui-divider); padding-top:4px; min-width:0; }
+.tile-ams { display:flex; align-items:center; gap:5px; min-width:0; }
+.tile-ams-label,.tile-more,.tile-material,.tile-updated { font-size:10px; line-height:14px; color:var(--ui-secondary); white-space:nowrap; }
+.tile-swatch { width:10px; height:10px; flex-shrink:0; border:1px solid var(--ui-border); border-radius:50%; background:var(--filament); }
+.tile-swatch.active { outline:1px solid var(--ui-primary); outline-offset:1px; }
+.tile-material { overflow:hidden; text-overflow:ellipsis; }
+.tile-more { color:var(--ui-primary); }
+/* Square management card: a single-column rhythm, with temperatures on one row. */
+.embedded .card-stage .tile-compact { grid-template-rows:18px minmax(0,1fr) 18px; padding:10px; gap:6px; }
+.tile-compact .tile-body { display:block; }
+.tile-compact .tile-info { height:100%; align-content:space-evenly; gap:3px; }
+.embedded .tile-compact .tile-task { font-size:11px; line-height:16px; }
+.embedded .tile-compact .tile-status { padding:2px 4px; font-size:10px; }
+.tile-compact .tile-metric { flex-direction:row; align-items:baseline; gap:4px; }
+.tile-compact .tile-remaining { justify-content:space-between; }
+/* CAST 2x2 is physically smaller than the management square. Four clear bands. */
+.embedded .card-stage .tile-cast { grid-template-rows:14px minmax(48px,1fr) 15px 14px; gap:4px; padding:8px; }
+.tile-cast .tile-header { gap:4px; }
+.tile-cast .tile-name { font-size:11px; line-height:14px; }
+.tile-cast .tile-body { grid-template-columns:32px minmax(0,1fr); gap:6px; }
+.embedded .tile-cast .tile-cover { width:32px; height:38px; max-height:38px; padding:2px; border-radius:5px; }
+.embedded .tile-cast .cover-image { height:32px; }
+.tile-cast .tile-info { gap:0; }
+.tile-cast .tile-hero { display:grid; justify-content:start; gap:0; }
+.embedded .card-stage .tile-cast .tile-progress-value { font-size:28px; line-height:34px; }
+.embedded .tile-cast .tile-percent { font-size:10px; line-height:13px; }
+.embedded .tile-cast .tile-status { font-size:11px; line-height:14px; padding:0; background:transparent; border-radius:0; }
+.tile-cast .tile-remaining { justify-content:space-between; gap:3px; }
+.tile-cast .tile-remaining-value { font-size:11px; }
+.tile-cast .tile-footer { padding-top:0; border:0; }
+.tile-cast .tile-ams { gap:4px; }
+.tile-cast .tile-swatch { width:9px; height:9px; }
+@media(max-height:120px) {
+  .embedded .card-stage .tile-cast { padding:6px; gap:3px; }
+  .tile-cast .tile-body { gap:4px; }
+}
+/* Details are scrollable; use the available height for readable secondary data. */
+.embedded .layout-detail .eyebrow,.embedded .layout-detail .metric-label,
+.embedded .layout-detail .section-count,.embedded .layout-detail .ams-unit-heading span,
+.embedded .layout-detail .tray-remaining,.embedded .layout-detail .using-tag,
+.embedded .layout-detail .card-footer { font-size:11px; }
+.embedded .layout-detail .tray-material,.embedded .layout-detail .slot-id,
+.embedded .layout-detail .external-tray { font-size:12px; }
+.embedded .layout-detail .tray-top { gap:8px; flex-wrap:wrap; }
+.embedded .layout-detail .trays { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.embedded .layout-detail .tray { padding:12px; }
+.embedded .layout-detail .cover-caption { font-size:10px; }
+.embedded .layout-detail .cover-caption { position:static; margin-top:4px; line-height:16px; }

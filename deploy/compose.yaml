@@ -1,0 +1,31 @@
+name: cube3d
+services:
+  dashboard:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: cube-3dprint-dashboard:local
+    restart: unless-stopped
+    init: true
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-3031}:3030"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3030
+      DASHBOARD_MODE: ${DASHBOARD_MODE:-setup}
+      DATA_DIR: /app/data
+      NODE_USE_ENV_PROXY: "1"
+      HTTP_PROXY: ${CLOUD_HTTP_PROXY:-}
+      HTTPS_PROXY: ${CLOUD_HTTP_PROXY:-}
+      NO_PROXY: localhost,127.0.0.1,::1
+    volumes:
+      - dashboard-data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+volumes:
+  dashboard-data:

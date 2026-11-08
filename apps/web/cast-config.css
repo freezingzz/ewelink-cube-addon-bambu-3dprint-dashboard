@@ -1,0 +1,64 @@
+.cast-config-columns {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+.cast-config-columns h2 {
+  font-size: 17px;
+  margin: 0 0 18px;
+}
+.cast-config-columns h3 {
+  font-size: 14px;
+  margin: 24px 0 10px;
+}
+.setup .cast-check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 9px 0;
+  font-size: 13px;
+}
+.setup .cast-check input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+}
+.cast-previews {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.cast-preview-cell {
+  display: grid;
+  gap: 8px;
+  max-width: 100%;
+}
+.cast-preview-cell > span {
+  font-size: 12px;
+}
+.cast-preview-surface {
+  padding: 9px;
+  border-radius: 12px;
+  background-image: var(--ui-cast-background);
+  background-size: 100% 900px;
+}
+.cast-preview-cell iframe {
+  display: block;
+  border: 0;
+  border-radius: 12px;
+}
+.cast-config-columns .hint {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1050px) {
+  .cast-config-columns {
+    grid-template-columns: 1fr;
+  }
+  .cast-previews {
+    gap: 14px;
+  }
+}

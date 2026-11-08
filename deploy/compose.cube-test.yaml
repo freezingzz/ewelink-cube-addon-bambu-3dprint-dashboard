@@ -1,0 +1,26 @@
+name: print-room-cube-test
+services:
+  dashboard:
+    image: ${PRINT_ROOM_IMAGE:?Set the verified test image reference}
+    restart: unless-stopped
+    init: true
+    ports:
+      - "3033:3030"
+    environment:
+      DASHBOARD_MODE: setup
+      HOST: 0.0.0.0
+      PORT: "3030"
+      DATA_DIR: /app/data
+      SETUP_PUBLIC_ORIGIN: ${SETUP_PUBLIC_ORIGIN:?Set the exact CUBE LAN origin including port 3033}
+      SETUP_ACCESS_KEY: ${SETUP_ACCESS_KEY:?Set a private management key of at least 32 characters}
+    volumes:
+      - print-room-data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  print-room-data:

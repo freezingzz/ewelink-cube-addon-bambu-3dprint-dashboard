@@ -1,0 +1,70 @@
+/* Original skin using measured CUBE visual tokens; the existing layout remains authoritative. */
+body.admin-shell{color:var(--ui-text);background:var(--ui-page)}
+.admin-brand,.brand{color:var(--ui-text);font-weight:600;letter-spacing:0}
+.admin-brand-mark,.brand-mark{background:var(--ui-primary-soft);color:var(--ui-primary);border-radius:8px;letter-spacing:0}
+.admin-nav{border-right-color:var(--ui-border)}
+.admin-nav nav a{border:1px solid transparent;padding:11px 13px}
+.admin-nav nav a>span{display:flex;align-items:center;justify-content:center}
+.admin-nav nav a[aria-current]{color:var(--ui-primary);border-color:var(--ui-primary);background:var(--ui-primary-soft);font-weight:500}
+.admin-nav nav a:hover{background:var(--ui-primary-soft);color:var(--ui-primary)}
+.admin-topbar h1,.admin-section-heading h2,.admin-panel-heading h2,.setup h2{font-weight:600;letter-spacing:0}
+.admin-eyebrow,.eyebrow,.task-eyebrow{letter-spacing:1px;color:var(--ui-muted)}
+.admin-button,.setup button,.setup .button,.size-reset,.size-input,select{border-radius:6px}
+.admin-button.primary,.setup button:not(.secondary):not(.text){background:var(--ui-primary);border-color:var(--ui-primary);color:white}
+.admin-button:hover,.setup .secondary:hover{border-color:var(--ui-primary);color:var(--ui-primary)}
+.admin-button.primary:hover,.setup button:not(.secondary):not(.text):hover{background:#40a9ff;color:white}
+.admin-button,.setup .secondary,.size-reset{background:var(--ui-surface);border-color:var(--ui-border);color:var(--ui-secondary)}
+.admin-stats article,.admin-panel,.admin-ams-unit,.printer-card,.size-preview{border-color:var(--ui-border);border-radius:12px;box-shadow:none}
+.admin-stats strong{font-weight:500}
+.printer-icon,.printer-symbol{background:var(--ui-primary-soft);border-color:transparent;color:var(--ui-primary)}
+.printer-icon,.printer-symbol,.brand-mark{display:grid;place-items:center}
+.printer-symbol svg,.printer-icon svg,.admin-brand-mark svg{display:block;flex-shrink:0}
+.admin-status,.status-badge{background:#e6f7ff;color:var(--ui-primary);border-radius:4px}
+.admin-status[data-tone=warning],.tone-warning .status-badge{background:#fffbe6;color:#ad6800}
+.admin-status[data-tone=danger],.tone-danger .status-badge{background:#fff1f0;color:var(--ui-danger)}
+.admin-status[data-tone=muted],.tone-muted .status-badge{background:var(--ui-fill);color:var(--ui-muted)}
+.live-dot,.setup-live-dot,.origin-dot{background:var(--ui-success)}
+.origin-dot.synthetic{background:var(--ui-warning)}
+.admin-alert,.message{background:#e6f7ff;border-color:#91d5ff;color:#096dd9}
+.admin-alert.demo,.notice{background:#fffbe6;border-color:#ffe58f;color:#ad8b00}
+.message.error,.admin-errors p{background:#fff1f0;border-color:#ffa39e;color:#cf1322}
+.admin-tray,.tray,.device{background:#fafafa;border-color:var(--ui-border)}
+.admin-tray.active,.tray.active,.device.selected{background:#f0f7ff;border-color:#91caff}
+.admin-spool:after{border-color:#d9d9d9}
+.admin-external,.external-tray{border-color:#d9d9d9;background:transparent}
+.admin-external .active-label,.using-tag{color:var(--ui-primary)}
+.admin-progress-track,.tile-track,.progress-track{background:#f0f0f0}
+.admin-progress-track>div,.tile-fill,.progress-fill{background:var(--ui-primary)}
+.progress-number{color:var(--ui-text)}
+.tile-origin{background:var(--ui-fill);color:var(--ui-muted)}
+.tile-swatch.active,.filament-swatch.active{outline-color:var(--ui-primary)}
+.card-footer,.tile-footer{border-color:var(--ui-divider)}
+.admin-tray,.tray{box-shadow:none}
+.preview-canvas{background-color:var(--ui-page);background-image:linear-gradient(#e9ebef 1px,transparent 1px),linear-gradient(90deg,#e9ebef 1px,transparent 1px)}
+.preview-canvas[data-surface=cast]{background-image:var(--ui-cast-background);background-size:100% 900px;background-repeat:no-repeat;background-color:#193e59;border-color:#193e59}
+.preview-space{outline:0;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,.15)}
+.card-preview-frame{background:transparent}
+/* Transparent document and card surfaces allow the real CAST background to show through. */
+html[data-surface=cast],html[data-surface=cast] body{background:transparent;color-scheme:light}
+html[data-surface=cast][data-frame=standalone]{background-image:var(--ui-cast-background);background-size:100% 900px;background-repeat:no-repeat;background-color:#193e59}
+html[data-surface=cast]{--cast-ink:#fff;--cast-secondary:rgba(255,255,255,.85);--cast-surface:rgba(255,255,255,.3);--cast-fill:rgba(255,255,255,.12);--cast-border:rgba(255,255,255,.25)}
+html[data-surface=cast][data-cast-state=active]{--cast-ink:#333;--cast-secondary:#999;--cast-surface:#fff;--cast-fill:#f2f2f6;--cast-border:transparent}
+html[data-surface=cast][data-cast-state=offline]{--cast-ink:rgba(255,255,255,.8);--cast-secondary:rgba(255,255,255,.75);--cast-surface:rgba(0,0,0,.15);--cast-fill:rgba(255,255,255,.08)}
+html[data-surface=cast] .embedded .printer-card{background:var(--cast-surface);color:var(--cast-ink);border-radius:12px;box-shadow:inset 0 0 0 1px var(--cast-border)}
+html[data-surface=cast] .tile-name,html[data-surface=cast] .progress-number,html[data-surface=cast] .tile-remaining-value,html[data-surface=cast] .metric-value,html[data-surface=cast] .printer-identity h2{color:var(--cast-ink)}
+html[data-surface=cast] .tile-origin,html[data-surface=cast] .cover,html[data-surface=cast] .tray{background:var(--cast-fill);color:var(--cast-secondary);border-color:var(--cast-border)}
+html[data-surface=cast] .embedded .tile .tile-status{background:transparent;color:var(--cast-ink);border:0}
+html[data-surface=cast][data-cast-state=active] .embedded .tile .tile-status{color:var(--ui-action)}
+html[data-surface=cast] .tile-ams-label,html[data-surface=cast] .tile-material,html[data-surface=cast] .tile-more,html[data-surface=cast] .tile-remaining-label,html[data-surface=cast] .tile-percent,html[data-surface=cast] .metric-label,html[data-surface=cast] .card-footer,html[data-surface=cast] .ams-unit-heading,html[data-surface=cast] .stage-note{color:var(--cast-secondary)}
+html[data-surface=cast] .tile-origin{padding:0 3px;border-radius:3px}
+html[data-surface=cast] .tile-swatch.active{outline-color:var(--cast-ink)}
+html[data-surface=cast] .ams-section,html[data-surface=cast] .card-header,html[data-surface=cast] .card-footer{border-color:var(--cast-border)}
+html[data-surface=cast][data-cast-state=active] .tone-danger .tile-status{color:var(--ui-danger)}
+html[data-surface=cast][data-cast-state=active] .tone-warning .tile-status{color:#ad6800}
+html[data-surface=cast]:not([data-cast-state=active]) .tone-danger .tile-status{color:#ffccc7}
+html[data-surface=cast]:not([data-cast-state=active]) .tone-warning .tile-status{color:#fff1b8}
+#admin-progress-fill{background:var(--ui-primary)}
+
+/* Real CUBE drawer overlays a 56px host header. Keep the content scrollport below it. */
+html[data-cube-drawer=true] body.embedded{overflow:hidden}
+html[data-cube-drawer=true] .embedded .card-stage.layout-detail{position:fixed;inset:56px 0 0;height:calc(100dvh - 56px);min-height:0;overflow-y:auto}

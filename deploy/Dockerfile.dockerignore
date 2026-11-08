@@ -1,0 +1,25 @@
+# Start closed: only runtime source, dependencies and license notices are sent.
+**
+!package.json
+!package-lock.json
+!LICENSE
+!NOTICE.md
+!apps/
+!apps/server/
+!apps/server/src/
+!apps/server/src/**
+!apps/web/
+!apps/web/**
+apps/web/tests/
+!packages/
+!packages/contracts/
+!packages/contracts/src/
+!packages/contracts/src/**
+!packages/cube-client/
+!packages/cube-client/src/
+!packages/cube-client/src/**
+!packages/printer-bambu/
+!packages/printer-bambu/src/
+!packages/printer-bambu/src/**
+!packages/printer-bambu/NOTICE.md
+!packages/printer-bambu/UPSTREAM_LICENSE

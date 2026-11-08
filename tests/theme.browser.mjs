@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {existsSync}from'node:fs';import{mkdir,writeFile}from'node:fs/promises';
+import{chromium}from'playwright';import{createDashboard}from'../apps/server/src/server.ts';import{makeDemo}from'../apps/server/src/demo.ts';
+const apps=[];let browser;
+try{
+ const scenes=['printing','idle','offline'],urls=[];
+ for(const scene of scenes){const app=createDashboard({initialSnapshot:makeDemo(scene),tickMs:3600000});apps.push(app);await new Promise(done=>app.server.listen(0,'127.0.0.1',done));urls.push(`http://127.0.0.1:${app.server.address().port}`);}
+ const chrome='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',executablePath=process.env.BROWSER_EXECUTABLE||(existsSync(chrome)?chrome:undefined);
+ browser=await chromium.launch({headless:true,...(executablePath?{executablePath}:{})});const page=await browser.newPage({locale:'zh-CN',viewport:{width:1100,height:440}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await mkdir('artifacts/theme',{recursive:true});
+ // Independently drawn references, using only documented 2.15.0 state colors/radius; not running CUBE.
+ const native=['<strong>客厅开关</strong><span class="symbol">⏻</span><small>已开启</small>','<strong>温湿度传感器</strong><span class="value">24.6°</span><small>室内温度</small>','<strong>卧室插座</strong><span class="symbol">⏻</span><small>离线</small>'];
+ await page.setContent(`<style>*{box-sizing:border-box}body{margin:0;padding:28px 38px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:linear-gradient(0deg,#8fb7cf 0%,#4f81a2 53%,#193e59 100%);background-size:100% 900px;color:white}h1{font-size:19px;margin:0 0 6px;font-weight:500}.note{font-size:11px;opacity:.8;margin:0 0 26px}.groups{display:flex;gap:36px}.group{display:grid;grid-template-columns:128px 128px;gap:10px 16px}h2{grid-column:1/-1;font-size:12px;margin:0 0 3px;font-weight:500}.native{width:128px;height:128px;border-radius:12px;padding:10px;display:flex;flex-direction:column;box-shadow:0 0 15px rgba(0,0,0,.15)}.native strong{font-size:12px;white-space:nowrap}.native small{font-size:11px;margin-top:auto}.symbol{font-size:31px;line-height:1;margin-top:19px;color:#1b66f2}.value{font-size:30px;font-weight:300;margin-top:15px}.native.active{background:#fff;color:#333}.native.idle{background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.25);color:#fff}.native.offline{background:rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.65)}.offline .symbol{color:inherit}iframe{width:128px;height:128px;border:0;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,.15);background:transparent}label{font-size:10px;opacity:.8}</style><h1>CUBE CAST 风格对照</h1><p class="note">左侧原生设备样式参考：按官方 2.15.0 CSS 重绘，非运行中的 CUBE。右侧为本项目真实 iframe（合成数据）。</p><div class="groups">${scenes.map((s,i)=>`<section class="group"><h2>${['活动 / 白色卡片','待机 / 半透明卡片','离线 / 低强调卡片'][i]}</h2><div class="native ${['active','idle','offline'][i]}">${native[i]}</div><iframe title="${s}" src="${urls[i]}/card?layout=cast"></iframe><label>设备样式参考</label><label>3D 打印机卡片</label></section>`).join('')}</div>`);
+ const results=[];
+ for(let i=0;i<3;i++){
+  const frame=page.frameLocator(`iframe[title=${scenes[i]}]`);await frame.locator('.tile-cast').waitFor();
+  const actual=await frame.locator('.tile-cast').evaluate(el=>({background:getComputedStyle(el).backgroundColor,color:getComputedStyle(el).color,radius:getComputedStyle(el).borderRadius,width:innerWidth,height:innerHeight,state:document.documentElement.dataset.castState,rootBackground:getComputedStyle(document.documentElement).backgroundColor}));
+  assert.equal(actual.width,128);assert.equal(actual.height,128);assert.equal(actual.radius,'12px');assert.equal(actual.rootBackground,'rgba(0, 0, 0, 0)');
+  if(i===0)assert.equal(await frame.locator('.tile-swatch').first().evaluate(el=>el.style.getPropertyValue('--filament')),makeDemo('printing').ams[0].trays[0].color);
+  assert.equal(actual.background,['rgb(255, 255, 255)','rgba(255, 255, 255, 0.3)','rgba(0, 0, 0, 0.15)'][i]);results.push({scene:scenes[i],...actual});
+ }
+ await page.screenshot({path:'artifacts/theme/cast-reference-blue.png',fullPage:true});
+ await page.evaluate(()=>document.body.style.backgroundImage='linear-gradient(0deg,#83a26a 0%,#1a4535 100%)');await page.screenshot({path:'artifacts/theme/cast-reference-green.png',fullPage:true});
+ await page.goto(urls[0]);await page.locator('.admin-ams-unit').first().waitFor();
+ const admin=await page.evaluate(()=>({background:getComputedStyle(document.body).backgroundColor,primary:getComputedStyle(document.documentElement).getPropertyValue('--ui-primary').trim(),activeMenu:getComputedStyle(document.querySelector('.admin-nav a[aria-current]')).backgroundColor,hasOutlineIcon:!!document.querySelector('.admin-brand-mark svg')}));
+ assert.equal(admin.background,'rgb(247, 248, 252)');assert.equal(admin.primary,'#1890ff');assert.equal(admin.activeMenu,'rgb(226, 242, 255)');assert.equal(admin.hasOutlineIcon,true);
+ assert.deepEqual(errors,[]);await writeFile('artifacts/theme/report.json',JSON.stringify({results,admin,evidence:'official CSS-derived reference redraw + local synthetic UI; no running CUBE'},null,2));console.log('Native CUBE skin: desktop tokens, CAST active/idle/offline colors, transparent iframe roots and 12px corners passed.');
+}finally{await browser?.close();await Promise.all(apps.map(a=>a.close()));}

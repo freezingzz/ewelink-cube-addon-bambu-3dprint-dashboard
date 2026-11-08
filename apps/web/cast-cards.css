@@ -1,0 +1,245 @@
+.embedded .card-stage .cast-module {
+  display: grid;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  padding: 7px;
+  gap: 3px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.3;
+}
+.cast-module h2 {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  margin: 0;
+  min-width: 0;
+}
+.cast-job {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cast-status {
+  grid-template-rows: 16px minmax(30px, 1fr) 16px 16px;
+}
+.cast-status-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 0;
+}
+.cast-digits {
+  display: flex;
+  gap: 1px;
+  align-items: baseline;
+  min-width: 0;
+}
+.cast-digits strong {
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 550;
+  letter-spacing: -1px;
+}
+.cast-digits small {
+  font-size: 10px;
+}
+.cast-state {
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--ui-primary);
+  min-width: 0;
+}
+.cast-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.cast-data-row > span {
+  opacity: 0.7;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.cast-data-row strong {
+  font-size: 12px;
+  font-weight: 550;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cast-ams {
+  grid-template-rows: 16px minmax(0, 1fr);
+}
+.cast-module-heading {
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
+  min-width: 0;
+}
+.cast-module-heading h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cast-material-state {
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+.cast-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 4px;
+  min-height: 0;
+}
+/* Give four-slot material names a full line at the smallest CAST size. */
+.cast-slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(16px, 1fr) 14px;
+  align-items: center;
+  justify-items: center;
+  gap: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 5px;
+  padding: 3px;
+  min-width: 0;
+  min-height: 0;
+  background: var(--ui-fill);
+}
+.cast-slot.active {
+  border-color: var(--ui-primary);
+}
+.cast-slot strong {
+  line-height: 14px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 550;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.cast-slot small {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  grid-column: 1/-1;
+  text-align: center;
+  font-size: 10px;
+  line-height: 10px;
+  opacity: 0.7;
+}
+.cast-spool {
+  width: 16px;
+  height: 16px;
+  border: 4px solid var(--filament);
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+}
+.cast-slot-single {
+  grid-template-columns: 1fr;
+}
+.cast-slot-single .cast-slot {
+  grid-template-rows: 1fr 13px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  padding: 7px;
+  gap: 4px;
+}
+.cast-slot-single .cast-slot small {
+  position: static;
+  grid-column: 1/-1;
+  line-height: 12px;
+}
+.cast-slot-single .cast-spool {
+  width: 30px;
+  height: 30px;
+  border-width: 6px;
+}
+.cast-slot-single strong {
+  font-size: 17px;
+}
+.cast-no-material {
+  grid-column: 1/-1;
+  align-self: center;
+  text-align: center;
+  font-size: 11px;
+  margin: 0;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+.cast-summary {
+  grid-template-rows: 16px minmax(0, 1fr) 27px;
+}
+.cast-summary .cast-data-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  line-height: 13px;
+}
+.cast-summary .cast-data-row > span {
+  font-size: 10px;
+}
+.cast-summary .cast-data-row strong {
+  font-size: 11px;
+  line-height: 14px;
+}
+.embedded .cast-module .cast-summary-cover {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  padding: 3px;
+  gap: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.cast-summary-cover .cover-image {
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+.cast-summary-cover .cover-caption,
+.cast-summary-cover .cover-placeholder-icon,
+.cast-summary-cover > span {
+  display: none;
+}
+.cast-summary-cover strong {
+  font-size: 11px;
+  line-height: 15px;
+  text-align: center;
+}
+html[data-cast-state='idle'] .cast-module,
+html[data-cast-state='offline'] .cast-module {
+  color: white;
+}
+html[data-cast-state='idle'] .cast-module .cast-state,
+html[data-cast-state='offline'] .cast-module .cast-state {
+  color: inherit;
+}
+html[data-cast-state='idle'] .cast-slot,
+html[data-cast-state='offline'] .cast-slot {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+html[data-cast-state='idle'] .cast-slot.active,
+html[data-cast-state='offline'] .cast-slot.active {
+  border-color: white;
+}

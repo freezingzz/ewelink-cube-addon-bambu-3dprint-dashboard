@@ -1,0 +1,831 @@
+:root{
+  font-family:var(--ui-font);
+  color:var(--ui-text);
+  background:var(--ui-page);
+  font-synthesis:none;
+  font-size:14px}
+
+*{
+  box-sizing:border-box}
+body{
+  margin:0}
+button,select{
+  font:inherit}
+button,a,select{
+  -webkit-tap-highlight-color:transparent}
+button,select{
+  cursor:pointer}
+button:focus-visible,a:focus-visible,select:focus-visible{
+  outline:3px solid var(--ui-muted);
+  outline-offset:3px}
+[hidden]{
+  display:none!important}
+a{
+  color:inherit;
+  text-decoration:none}
+.workspace{
+  max-width:1140px;
+  margin:auto;
+  padding:30px 38px}
+.page-header,.page-footer,.page-intro,.preview-toolbar,.preview-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px}
+.page-header{
+  padding-bottom:28px;
+  border-bottom:1px solid var(--ui-divider)}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+  font-weight:750;
+  letter-spacing:2px}
+.brand small{
+  display:block;
+  font-size:10px;
+  letter-spacing:2px;
+  color:var(--ui-muted);
+  margin-top:5px;
+  font-weight:400}
+.brand-mark{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:39px;
+  height:39px;
+  background:var(--ui-primary);
+  color:white;
+  font-size:27px;
+  border-radius:12px;
+  position:relative;
+  letter-spacing:-3px}
+.brand-mark span{
+  font-size:14px;
+  position:absolute;
+  right:7px;
+  top:5px}
+.header-note{
+  font-size:11px;
+  color:var(--ui-muted);
+  display:flex;
+  gap:8px;
+  align-items:center}
+.dot{
+  display:inline-block;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:currentColor}
+.page-intro{
+  padding:46px 0 30px}
+.eyebrow{
+  font-size:9px;
+  letter-spacing:1.8px;
+  color:var(--ui-muted);
+  font-weight:650;
+  margin:0 0 9px}
+h1{
+  font-size:30px;
+  letter-spacing:1px;
+  margin:0;
+  font-weight:600;
+  line-height:1.5}
+.intro-description{
+  font-size:12px;
+  color:var(--ui-muted);
+  margin:10px 0 0}
+.phase-pill{
+  display:flex;
+  align-items:center;
+  gap:22px;
+  font-size:11px;
+  border:1px solid var(--ui-border);
+  padding:10px 14px;
+  border-radius:30px;
+  color:var(--ui-muted);
+  white-space:nowrap}
+.phase-pill span{
+  font-size:12px;
+  color:var(--ui-primary);
+  font-weight:700}
+.preview-toolbar{
+  margin-bottom:15px}
+.view-tabs{
+  display:flex;
+  gap:3px;
+  padding:4px;
+  border:1px solid var(--ui-divider);
+  background:var(--ui-fill);
+  border-radius:10px}
+.view-tabs button{
+  border:0;
+  background:transparent;
+  padding:8px 20px;
+  color:var(--ui-secondary);
+  font-size:11px;
+  border-radius:7px}
+.view-tabs button.selected{
+  background:#fff;
+  color:var(--ui-primary);
+  box-shadow:0 2px 5px #0000000a;
+  font-weight:600}
+.scenario-control{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--ui-muted);
+  font-size:11px}
+select{
+  border:1px solid var(--ui-border);
+  border-radius:7px;
+  background:#fff;
+  padding:9px 30px 9px 12px;
+  color:var(--ui-text);
+  font-size:11px;
+  max-width:250px}
+select:disabled{
+  opacity:.55}
+.notice{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  background:var(--ui-fill);
+  border:1px solid var(--ui-border);
+  border-radius:8px;
+  padding:11px 15px;
+  margin-bottom:20px;
+  color:var(--ui-secondary)}
+.notice-icon{
+  font-size:19px;
+  color:var(--ui-muted)}
+.notice p{
+  margin:0;
+  font-size:10px;
+  line-height:1.6}
+.notice strong{
+  margin-right:12px;
+  font-weight:600}
+.notice span:not(.notice-icon){
+  color:var(--ui-muted)}
+.card-stage{
+  padding:8px 0 24px;
+  min-width:0}
+.printer-card{
+  background:#fff;
+  border:1px solid var(--ui-border);
+  border-radius:16px;
+  padding:25px 28px;
+  box-shadow:0 15px 35px #0000000a;
+  overflow:hidden;
+  min-width:0}
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding-bottom:21px;
+  border-bottom:1px solid var(--ui-divider)}
+.printer-identity{
+  display:flex;
+  gap:13px;
+  align-items:center;
+  min-width:0}
+.printer-symbol{
+  width:42px;
+  height:42px;
+  flex-shrink:0;
+  display:grid;
+  place-items:center;
+  background:var(--ui-fill);
+  border:1px solid var(--ui-border);
+  border-radius:12px;
+  font-size:25px;
+  color:var(--ui-primary)}
+.printer-identity .eyebrow{
+  font-size:8px;
+  margin-bottom:4px;
+  letter-spacing:1.5px}
+.printer-identity h2{
+  font-size:17px;
+  font-weight:600;
+  margin:0;
+  overflow-wrap:anywhere}
+.status-badge{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  border-radius:30px;
+  padding:6px 11px;
+  background:var(--ui-fill);
+  color:var(--ui-primary);
+  font-size:10px;
+  white-space:nowrap;
+  flex-shrink:0}
+.tone-muted .status-badge{
+  background:var(--ui-fill);
+  color:var(--ui-muted)}
+.tone-warning .status-badge{
+  background:#fcf2db;
+  color:#a0803b}
+.tone-danger .status-badge{
+  background:#f9e9e4;
+  color:#b8644b}
+.card-content{
+  display:grid;
+  grid-template-columns:minmax(160px, .9fr) minmax(230px,1.6fr);
+  gap:34px;
+  padding:25px 0 22px}
+.cover{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  min-height:210px;
+  border-radius:12px;
+  background:var(--ui-fill);
+  overflow:hidden;
+  gap:10px;
+  text-align:center;
+  color:var(--ui-muted);
+  padding:14px}
+.cover-image{
+  display:block;
+  max-width:100%;
+  width:100%;
+  height:185px;
+  object-fit:contain}
+.cover-caption{
+  position:absolute;
+  bottom:12px;
+  font-size:8px;
+  letter-spacing:1px;
+  color:var(--ui-muted)}
+.cover-placeholder-icon{
+  font-size:46px;
+  font-weight:300;
+  opacity:.5}
+.cover strong{
+  font-size:12px;
+  font-weight:500}
+.cover>span:not(.cover-caption){
+  font-size:9px}
+.print-info{
+  padding-top:7px;
+  min-width:0}
+.print-info .eyebrow{
+  font-size:8px;
+  letter-spacing:1.4px;
+  margin-bottom:8px}
+.job-name{
+  font-size:18px;
+  font-weight:550;
+  line-height:1.6;
+  margin:0 0 5px;
+  overflow-wrap:anywhere}
+.stage-note{
+  font-size:10px;
+  color:var(--ui-muted);
+  margin:0 0 18px;
+  min-height:16px}
+.progress-summary{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-top:8px}
+.progress-number{
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  color:var(--ui-primary)}
+.progress-number strong{
+  font-size:62px;
+  letter-spacing:-3px;
+  line-height:1.25;
+  font-weight:500;
+  font-variant-numeric:tabular-nums}
+.progress-number>span{
+  font-size:18px;
+  color:var(--ui-muted)}
+.metric{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  min-width:0}
+.metric-label{
+  font-size:9px;
+  color:var(--ui-muted);
+  letter-spacing:.3px}
+.metric-value{
+  font-size:17px;
+  font-weight:550;
+  white-space:normal;
+  font-variant-numeric:tabular-nums}
+.remaining{
+  align-items:flex-end}
+.remaining .metric-value{
+  font-size:18px}
+.progress-track{
+  height:5px;
+  background:var(--ui-fill);
+  border-radius:20px;
+  overflow:hidden;
+  margin:12px 0 20px}
+.progress-fill{
+  height:100%;
+  background:var(--ui-primary);
+  border-radius:20px;
+  transition:width .6s ease}
+.print-metrics{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px}
+.print-metrics .metric+.metric{
+  border-left:1px solid var(--ui-divider);
+  padding-left:20px}
+.print-metrics .metric-value{
+  font-size:15px}
+.material-strip{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:12px 0;
+  border-top:1px solid var(--ui-divider)}
+.filament-swatch{
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  background:var(--filament,#ccc);
+  border:2px solid #fff;
+  outline:1px solid var(--ui-border)}
+.filament-swatch.active{
+  outline:2px solid var(--ui-primary)}
+.material-caption{
+  font-size:9px;
+  color:var(--ui-muted);
+  margin-left:auto}
+.card-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-top:14px;
+  border-top:1px solid var(--ui-divider);
+  font-size:8px;
+  color:var(--ui-muted)}
+.data-origin{
+  display:flex;
+  align-items:center;
+  gap:6px}
+.origin-dot{
+  width:5px;
+  height:5px;
+  background:var(--ui-primary);
+  border-radius:50%}
+.origin-dot.synthetic{
+  background:#b4a66b}
+.last-update{
+  text-align:right;
+  white-space:nowrap}
+.preview-footer,.page-footer{
+  font-size:9px;
+  color:var(--ui-muted);
+  letter-spacing:.3px}
+.preview-footer{
+  margin:0 0 44px}
+.page-footer{
+  padding-top:20px;
+  border-top:1px solid var(--ui-divider);
+  font-size:8px}
+.transport-message{
+  padding:10px 14px;
+  margin-bottom:14px;
+  color:#957b35;
+  background:#fff5d9;
+  border-radius:8px;
+  font-size:11px;
+  line-height:1.6}
+.transport-message.error{
+  color:#b45f4a;
+  background:#fcece7}
+.loading-card{
+  background:white;
+  border:1px solid var(--ui-divider);
+  border-radius:15px;
+  padding:50px;
+  text-align:center;
+  color:var(--ui-muted)}
+.loading-line{
+  display:block;
+  background:var(--ui-border);
+  width:60px;
+  height:5px;
+  border-radius:5px;
+  margin:auto}
+.error-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:8px 0 14px}
+.printer-error{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  background:#fcedea;
+  color:#aa6852;
+  font-size:10px;
+  border-radius:6px;
+  overflow-wrap:anywhere}
+.printer-error code{
+  margin-left:auto;
+  font-size:8px}
+.printer-error.warning{
+  background:#fff7df;
+  color:#967c3f}
+.ams-section{
+  padding:20px 0 6px;
+  border-top:1px solid var(--ui-divider)}
+.section-heading,.ams-unit-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px}
+.section-heading h3{
+  font-size:13px;
+  font-weight:600;
+  margin:0}
+.section-count,.ams-unit-heading span{
+  font-size:9px;
+  color:var(--ui-muted)}
+.ams-unit{
+  margin-top:17px}
+.ams-unit-heading{
+  margin-bottom:10px}
+.ams-unit-heading strong{
+  font-size:10px;
+  font-weight:550}
+.trays{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px}
+.tray{
+  background:var(--ui-fill);
+  border:1px solid var(--ui-border);
+  border-radius:9px;
+  padding:11px;
+  min-width:0}
+.tray.active{
+  background:var(--ui-fill);
+  border-color:var(--ui-muted)}
+.tray.empty{
+  color:var(--ui-muted);
+  background:var(--ui-fill)}
+.tray-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:4px}
+.slot-id{
+  font-size:9px;
+  color:var(--ui-muted)}
+.using-tag{
+  font-size:8px;
+  color:var(--ui-primary);
+  white-space:nowrap}
+.spool{
+  font-size:40px;
+  line-height:1.5;
+  text-align:center;
+  color:var(--filament,#ccc);
+  text-shadow:0 1px 1px #0000000a}
+.tray.empty .spool{
+  color:var(--ui-border);
+  text-shadow:none}
+.tray-material,.tray-remaining{
+  display:block;
+  text-align:center;
+  overflow-wrap:anywhere}
+.tray-material{
+  font-size:10px;
+  font-weight:550}
+.tray-remaining{
+  font-size:8px;
+  color:var(--ui-muted);
+  margin-top:5px}
+.external-tray{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:13px;
+  margin-top:13px;
+  border:1px dashed var(--ui-border);
+  border-radius:8px;
+  font-size:10px;
+  color:var(--ui-muted)}
+.external-tray strong{
+  color:var(--ui-text)}
+.external-tray .using-tag{
+  margin-left:auto}
+.connection-details{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  padding:18px 0;
+  gap:15px;
+  border-top:1px solid var(--ui-divider)}
+.connection-details .metric-value{
+  font-size:11px}
+.empty-note{
+  font-size:11px;
+  color:var(--ui-muted);
+  line-height:1.8;
+  margin-top:20px}
+.layout-compact{
+  max-width:340px;
+  margin:auto}
+.layout-compact .printer-card{
+  padding:18px}
+.layout-compact .printer-symbol{
+  display:none}
+.layout-compact .card-header{
+  padding-bottom:12px}
+.layout-compact .printer-identity h2{
+  font-size:13px}
+.layout-compact .status-badge{
+  padding:5px 8px;
+  font-size:9px}
+.layout-compact .card-content{
+  display:block;
+  padding:14px 0}
+.layout-compact .cover{
+  display:none}
+.layout-compact .print-info{
+  padding:0}
+.layout-compact .job-name{
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis}
+.layout-compact .print-info .eyebrow{
+  display:none}
+.layout-compact .progress-number strong{
+  font-size:48px}
+.layout-compact .remaining .metric-value{
+  font-size:12px}
+.layout-compact .progress-track{
+  margin:8px 0 13px}
+.layout-compact .print-metrics .metric+.metric{
+  padding-left:10px}
+.layout-compact .metric-value{
+  font-size:12px}
+.layout-compact .metric-label{
+  font-size:8px}
+.layout-compact .card-footer{
+  font-size:7px;
+  padding-top:12px}
+.layout-cast{
+  max-width:800px;
+  margin:auto}
+.layout-cast .printer-card{
+  padding:26px}
+.layout-cast .card-content{
+  grid-template-columns:1fr 1.4fr;
+  gap:25px}
+.layout-cast .cover{
+  min-height:180px}
+.layout-cast .cover-image{
+  height:155px}
+.layout-cast .progress-number strong{
+  font-size:58px}
+.layout-detail .card-content{
+  grid-template-columns:1fr 1.6fr}
+.embedded{
+  background:transparent}
+.embedded .workspace{
+  padding:10px;
+  max-width:none}
+.embedded .notice{
+  padding:7px 10px;
+  margin:0 0 8px;
+  border-radius:6px}
+.embedded .notice p{
+  font-size:8px}
+.embedded .notice p>span{
+  display:none}
+.embedded .notice-icon{
+  font-size:13px}
+.embedded .card-stage{
+  padding:0}
+.embedded .printer-card{
+  box-shadow:none}
+.embedded .layout-compact{
+  max-width:none}
+.embedded .layout-compact .printer-card{
+  padding:14px}
+.embedded .layout-wide .printer-card{
+  padding:18px}
+.embedded .layout-wide .card-content{
+  grid-template-columns:160px 1fr;
+  gap:20px;
+  padding:17px 0}
+.embedded .layout-wide .cover{
+  min-height:160px}
+.embedded .layout-wide .cover-image{
+  height:135px}
+.embedded .layout-wide .job-name{
+  font-size:14px}
+.embedded .layout-wide .progress-number strong{
+  font-size:45px}
+.embedded .layout-wide .stage-note{
+  margin-bottom:6px}
+.embedded .layout-wide .card-header{
+  padding-bottom:12px}
+.embedded .layout-wide .material-strip{
+  padding:9px 0}
+.embedded .layout-wide .progress-track{
+  margin:7px 0 14px}
+.embedded .layout-cast .printer-card{
+  padding:20px}
+.embedded .layout-cast .ams-section{
+  padding-top:13px}
+.embedded .layout-cast .tray{
+  padding:8px}
+.embedded .layout-cast .spool{
+  font-size:32px}
+.embedded .layout-cast .ams-unit{
+  margin-top:12px}
+.embedded .layout-detail .printer-card{
+  padding:20px}
+.embedded .layout-detail .card-content{
+  grid-template-columns:1fr;
+  gap:20px}
+.embedded .layout-detail .cover{
+  min-height:180px}
+.embedded .layout-detail .cover-image{
+  height:170px}
+.embedded .layout-detail .job-name{
+  font-size:16px}
+
+@media(max-width:700px){
+  .workspace{
+  padding:20px}
+.page-intro{
+  padding:30px 0 23px}
+.phase-pill,.header-note{
+  display:none}
+h1{
+  font-size:24px}
+.preview-toolbar{
+  flex-direction:column;
+  align-items:stretch;
+  gap:12px}
+.view-tabs{
+  justify-content:space-between}
+.view-tabs button{
+  padding:8px 15px}
+.scenario-control{
+  justify-content:space-between}
+.notice p>span{
+  display:block}
+.notice strong{
+  display:block}
+.printer-card{
+  padding:20px}
+.card-content,.layout-detail .card-content{
+  grid-template-columns:1fr;
+  gap:18px;
+  padding:20px 0}
+.cover{
+  min-height:190px}
+.cover-image{
+  height:170px}
+.print-info{
+  padding:0}
+.progress-number strong{
+  font-size:56px}
+.job-name{
+  font-size:16px}
+.material-caption{
+  font-size:8px}
+.page-footer{
+  gap:15px;
+  font-size:7px}
+.page-footer>span:last-child{
+  display:none}
+.preview-footer{
+  font-size:8px}
+.card-footer{
+  font-size:7px}
+.trays{
+  gap:6px}
+.tray{
+  padding:8px}
+.printer-error{
+  flex-wrap:wrap}
+.layout-cast .card-content{
+  grid-template-columns:1fr 1.3fr;
+  gap:15px}
+.layout-cast .cover{
+  min-height:140px}
+.layout-cast .cover-image{
+  height:125px}
+.layout-cast .progress-number strong{
+  font-size:46px}
+.layout-cast .job-name{
+  font-size:14px}
+.layout-cast .remaining .metric-value{
+  font-size:13px}
+.layout-cast .print-metrics .metric+.metric{
+  padding-left:8px}
+.layout-cast .metric-value{
+  font-size:12px}
+.layout-cast .stage-note{
+  margin-bottom:8px}
+}
+
+@media(max-width:440px){
+  .embedded .layout-wide .card-content,.layout-cast .card-content{
+  grid-template-columns:1fr}
+.embedded .layout-wide .cover{
+  display:none}
+.layout-cast .cover{
+  min-height:150px}
+.print-metrics .metric+.metric{
+  padding-left:10px}
+.remaining .metric-value{
+  font-size:15px}
+.status-badge{
+  font-size:9px}
+.printer-identity h2{
+  font-size:14px}
+.printer-symbol{
+  width:34px;
+  height:34px;
+  font-size:21px}
+.trays{
+  grid-template-columns:repeat(2,minmax(0,1fr))}
+.embedded .layout-compact .trays{
+  grid-template-columns:repeat(2,minmax(0,1fr))}
+.embedded .notice{
+  margin-bottom:6px}
+.embedded .layout-compact .printer-card{
+  border-radius:11px}
+.preview-footer span:last-child{
+  display:none}
+.connection-details{
+  gap:8px}
+.connection-details .metric-value{
+  font-size:10px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{
+  transition:none!important;
+  scroll-behavior:auto!important}
+}
+
+/* Embedded previews keep primary information inside the tested card viewport. */
+.embedded .layout-wide .printer-card { padding:14px 18px; }
+.embedded .layout-wide .printer-symbol { width:32px; height:32px; font-size:21px; }
+.embedded .layout-wide .printer-identity h2 { font-size:14px; }
+.embedded .layout-wide .card-header { padding-bottom:10px; }
+.embedded .layout-wide .card-content { padding:12px 0; gap:18px; }
+.embedded .layout-wide .cover { min-height:135px; max-height:145px; }
+.embedded .layout-wide .cover-image { height:115px; }
+.embedded .layout-wide .job-name { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.embedded .layout-wide .stage-note { margin:0 0 4px; font-size:9px; }
+.embedded .layout-wide .progress-summary { margin-top:2px; }
+.embedded .layout-wide .progress-number strong { font-size:40px; }
+.embedded .layout-wide .remaining .metric-value { font-size:14px; }
+.embedded .layout-wide .progress-track { height:4px; margin:6px 0 10px; }
+.embedded .layout-wide .print-metrics .metric { gap:4px; }
+.embedded .layout-wide .print-metrics .metric-value { font-size:12px; }
+.embedded .layout-wide .material-strip { padding:8px 0; }
+.embedded .layout-wide .card-footer { padding-top:10px; }
+.embedded .layout-compact .printer-card { padding:11px 13px; }
+.embedded .layout-compact .card-header { padding-bottom:9px; }
+.embedded .layout-compact .card-content { padding:11px 0; }
+.embedded .layout-compact .progress-number strong { font-size:44px; }
+.embedded .layout-wide .print-info > .eyebrow,
+.embedded .layout-wide .stage-note { display:none; }
+.embedded .layout-wide .cover { min-height:135px; max-height:135px; }
+/* Preview chrome never participates in the embedded card's viewport. */
+.preview-host.card-stage { max-width:none; margin:0; }
+.size-preview { padding:18px; border:1px solid var(--ui-divider); background:#fff; border-radius:12px; }
+.size-controls { display:flex; flex-wrap:wrap; align-items:center; gap:14px; }
+.size-input-label { display:flex; gap:7px; align-items:center; font-size:11px; color:var(--ui-muted); }
+.size-input { width:75px; padding:7px 8px; border:1px solid var(--ui-border); border-radius:6px; color:var(--ui-text); font:inherit; }
+.size-zoom { padding:7px 22px 7px 9px; }
+.size-reset { border:1px solid var(--ui-border); background:var(--ui-fill); border-radius:6px; padding:7px 10px; font-size:11px; color:var(--ui-primary); }
+.size-description { margin:16px 0 5px; font-size:12px; line-height:1.6; color:var(--ui-text); }
+.size-source { margin:0 0 16px; font-size:10px; color:var(--ui-muted); line-height:1.7; }
+.preview-canvas { overflow:auto; padding:25px; background-color:var(--ui-fill); background-image:linear-gradient(var(--ui-border) 1px,transparent 1px),linear-gradient(90deg,var(--ui-border) 1px,transparent 1px); background-size:10px 10px; border:1px solid var(--ui-border); border-radius:8px; }
+.preview-space { border-radius:12px; overflow:hidden; position:relative; flex-shrink:0; margin:auto; outline:1px solid var(--ui-muted); box-shadow:0 6px 20px #0000000a; }
+.card-preview-frame { position:absolute; left:0; top:0; display:block; border:0; transform-origin:top left; background:white; }
+.embedded .workspace { padding:0; }
+.embedded .printer-card { border:0; border-radius:0; }
+.embedded .layout-compact .printer-card,.embedded .layout-wide .printer-card,.embedded .layout-cast .printer-card { min-height:100vh; }
+@media(max-width:700px) { .size-preview { padding:12px; } .preview-canvas { padding:15px; } .size-controls { gap:9px; } }

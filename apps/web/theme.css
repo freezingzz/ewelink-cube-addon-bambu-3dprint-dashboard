@@ -1,0 +1,19 @@
+/* CUBE OS 2.15.0 visual references: docs/research/T-014-native-cube-style.md. */
+:root {
+  --ui-font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --ui-primary:#1890ff;
+  --ui-action:#1b66f2;
+  --ui-primary-soft:#e2f2ff;
+  --ui-text:#333;
+  --ui-secondary:#666;
+  --ui-muted:#999;
+  --ui-page:#f7f8fc;
+  --ui-surface:#fff;
+  --ui-fill:#f2f2f6;
+  --ui-border:#e6e8ed;
+  --ui-divider:#eee;
+  --ui-warning:#faad14;
+  --ui-danger:#ff4d4f;
+  --ui-success:#34c759;
+  --ui-cast-background:linear-gradient(0deg,#8fb7cf 0%,#4f81a2 53%,#193e59 100%);
+}

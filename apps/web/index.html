@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Print Room · H2C 打印看板</title>
+  <link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/tiles.css"><link rel="stylesheet" href="/cast-cards.css">
+  <link rel="stylesheet" href="/admin-shell.css">
+  <script type="module" src="/app.js"></script>
+<link rel="stylesheet" href="/cube-surfaces.css"></head>
+<body>
+  <div class="workspace" id="app">
+    <header class="page-header" id="page-header">
+      <a class="brand" href="/" aria-label="Print Room 首页"><span class="brand-mark" aria-hidden="true">P<span>↗</span></span><span>PRINT ROOM<small>我的打印空间</small></span></a>
+      <div class="header-note"><span class="dot"></span> CUBE 卡片开发预览 <a id="cloud-setup-link" href="/setup" hidden>云端设置 ↗</a></div>
+    </header>
+    <main>
+      <section class="page-intro" id="page-intro">
+        <div><p class="eyebrow">CUBE / CARD PREVIEW</p><h1>CUBE 卡片预览</h1><p class="intro-description">按目标内容区检查卡片与详情排版。管理与登录请使用左侧导航。</p></div>
+        <span class="phase-pill">本地原型 <span>01</span></span>
+      </section>
+      <section class="preview-toolbar" id="preview-toolbar" aria-label="卡片预览设置">
+        <div class="view-tabs" role="group" aria-label="布局"><button data-layout="wide" type="button">2×1 主卡</button><button data-layout="compact" type="button">1×1 紧凑</button><button data-layout="cast" type="button">2×2 CAST</button><button data-layout="detail" type="button">详情</button></div>
+        <label class="scenario-control">演示场景<select id="scenario-select" disabled><option>正在加载…</option></select></label>
+      </section>
+      <section class="notice" id="demo-notice" hidden><span class="notice-icon" aria-hidden="true">◈</span><p><strong>合成数据演示</strong><span>尚未连接你的打印机；CUBE 嵌入与真实云端数据仍待验证。</span></p></section>
+      <div class="transport-message" id="transport-message" role="status" aria-live="polite" hidden></div>
+      <section class="card-stage" id="card-stage"><div class="loading-card" role="status"><span class="loading-line"></span><p>正在获取打印状态…</p></div></section>
+      <div class="preview-footer" id="preview-footer"><span>云端采集 → 统一状态 → 实时卡片</span><span>只读监控 · 无打印控制</span></div>
+    </main>
+    <footer class="page-footer" id="page-footer"><span>PRINT ROOM / CUBE 3D PRINT DASHBOARD</span><span>为持续的创造，留一扇小窗。</span></footer>
+  </div>
+</body>
+</html>
