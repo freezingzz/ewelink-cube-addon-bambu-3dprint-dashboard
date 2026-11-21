@@ -12,44 +12,35 @@
   font-size: 14px;
   margin: 24px 0 10px;
 }
-.setup .cast-check {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin: 9px 0;
-  font-size: 13px;
-}
-.setup .cast-check input {
-  width: 16px;
-  height: 16px;
-  min-height: 0;
-  margin: 0;
-}
 .cast-previews {
-  display: flex;
-  align-items: flex-start;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-top: 22px;
-}
-.cast-preview-cell {
-  display: grid;
-  gap: 8px;
+  margin-top: 18px;
   max-width: 100%;
-}
-.cast-preview-cell > span {
-  font-size: 12px;
+  overflow-x: auto;
 }
 .cast-preview-surface {
+  width: max-content;
   padding: 9px;
   border-radius: 12px;
   background-image: var(--ui-cast-background);
   background-size: 100% 900px;
 }
-.cast-preview-cell iframe {
+.cast-preview-surface iframe {
   display: block;
   border: 0;
   border-radius: 12px;
+}
+.cast-config-columns .admin-panel {
+  min-width: 0;
+}
+#cast-management {
+  min-width: 0;
+  margin: 22px 0 0;
+  padding: 0;
+  border: 0;
+}
+#cast-management legend {
+  margin-bottom: 8px;
+  font-weight: 600;
 }
 .cast-config-columns .hint {
   overflow-wrap: anywhere;

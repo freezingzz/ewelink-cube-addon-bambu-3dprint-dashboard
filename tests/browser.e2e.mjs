@@ -22,7 +22,7 @@ try {
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto(base+'/preview');
   const frame = page.frameLocator('#card-preview');
-  const cardFrame = () => page.frames().find(f => f.url().includes('/card?'));
+  const cardFrame = () => page.frames().find(f => f.url().includes('/card?') || f.url().includes('/cast-card/'));
   await frame.locator('.printer-card').waitFor();
   assert.match(await page.locator('#demo-notice').innerText(), /合成/);
   await cardFrame().waitForFunction(() => document.querySelector('.cover-image')?.naturalWidth > 0);
@@ -69,7 +69,7 @@ try {
   await page.locator('.size-reset').click();
   assert.deepEqual(await cardFrame().evaluate(() => [innerWidth, innerHeight]), [368, 170]);
   await page.locator('[data-layout=cast]').click();
-  await frame.locator('.printer-card').waitFor();
+  await frame.locator('.tile.s2x2').waitFor();
   await page.selectOption('#preview-cast-host', 'desktop16');
   assert.equal(await page.locator('#card-preview').evaluate(n => n.getBoundingClientRect().width), 136.375);
   assert.match(await page.locator('#preview-size-source').innerText(), /16 列/);

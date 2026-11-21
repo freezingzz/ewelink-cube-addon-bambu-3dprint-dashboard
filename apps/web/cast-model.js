@@ -39,7 +39,7 @@ export function castState(s, lost = false) {
   };
   return getLocale() === 'en' ? en[key] || 'Waiting' : zh[key] || '等待数据';
 }
-export function finishTime(s) {
+export function finishTime(s, timeOnly = false) {
   if (
     s.connection !== 'online' ||
     s.freshness !== 'fresh' ||
@@ -58,8 +58,7 @@ export function finishTime(s) {
   return new Date(stamp + s.remainingSeconds * 1000).toLocaleString(
     getLocale(),
     {
-      month: '2-digit',
-      day: '2-digit',
+      ...(timeOnly ? {} : {month: '2-digit', day: '2-digit'}),
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,

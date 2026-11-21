@@ -5,7 +5,6 @@ import {
   createCardDefinition,
   registerCard,
   validateHttpUrl,
-  type CardDefinition,
 } from '../../../packages/cube-client/src/index.ts';
 // Replace complete JSON files atomically; tokens never enter the public API.
 async function writePrivateJson(file: string, value: unknown) {
@@ -22,45 +21,19 @@ async function writePrivateJson(file: string, value: unknown) {
   }
 }
 
-function webSettingsFingerprint(settings: CardDefinition['web_settings']) {
-  return JSON.stringify({
-    default: settings.default,
-    dimensions: settings.dimensions
-      .map(({ size, src }) => ({ size, src }))
-      .sort((a, b) => a.size.localeCompare(b.size)),
-    drawer: settings.drawer_component?.src,
-  });
-}
-
 export interface CastConfig {
-  status: boolean;
-  summary: boolean;
-  amsUnits: string[];
   language: 'zh-CN' | 'en';
   cubeUrl: string;
   dashboardUrl: string;
 }
 export const defaultCastConfig: CastConfig = {
-  status: true,
-  summary: true,
-  amsUnits: ['active'],
   language: 'zh-CN',
   cubeUrl: '',
   dashboardUrl: '',
 };
 export function validateCastConfig(value: unknown): CastConfig {
   const v = value as CastConfig;
-  if (
-    !v ||
-    typeof v.status !== 'boolean' ||
-    typeof v.summary !== 'boolean' ||
-    !Array.isArray(v.amsUnits) ||
-    v.amsUnits.length > 12 ||
-    v.amsUnits.some(
-      (u) => typeof u !== 'string' || !/^(active|external|\d{1,6})$/.test(u),
-    ) ||
-    !['zh-CN', 'en'].includes(v.language)
-  )
+  if (!v || !['zh-CN', 'en'].includes(v.language))
     throw Error('Invalid CAST configuration');
   const url = (input: unknown, reachable = false) => {
     if (input === '') return '';
@@ -68,50 +41,10 @@ export function validateCastConfig(value: unknown): CastConfig {
     return validateHttpUrl(input, reachable).origin;
   };
   return {
-    status: v.status,
-    summary: v.summary,
-    amsUnits: [...new Set(v.amsUnits)],
     language: v.language,
     cubeUrl: url(v.cubeUrl),
     dashboardUrl: url(v.dashboardUrl, true),
   };
-}
-export function castProfiles(c: CastConfig) {
-  return [
-    ...(c.status ? [{ id: 'status', kind: 'status', unit: '' }] : []),
-    ...c.amsUnits.map((unit) => ({ id: 'ams-' + unit, kind: 'ams', unit })),
-    ...(c.summary ? [{ id: 'summary', kind: 'summary', unit: '' }] : []),
-  ];
-}
-export function castDefinitions(c: CastConfig) {
-  if (!c.dashboardUrl || !c.cubeUrl)
-    throw Error('Configure CUBE and dashboard addresses');
-  return castProfiles(c).map((p) => {
-    const title =
-      p.kind === 'status'
-        ? 'Print status'
-        : p.kind === 'summary'
-          ? 'Job summary'
-          : p.unit === 'active'
-            ? 'Active material'
-            : p.unit === 'external'
-              ? 'External spool'
-              : `AMS ${p.unit}`;
-    // CUBE 2.15.0 requires Web settings for each UI resource, so each profile
-    // also appears in the CUBE list. This is not CAST-only registration.
-    // See docs/research/cube-web-cast-separation.md before changing this model.
-    const definition = createCardDefinition(
-      c.dashboardUrl,
-      `Print Room · ${title}`,
-    );
-    const url = new URL('/card', c.dashboardUrl);
-    url.searchParams.set('layout', 'cast');
-    url.searchParams.set('view', p.kind);
-    if (p.unit) url.searchParams.set('unit', p.unit);
-    url.searchParams.set('lang', c.language);
-    definition.cast_settings.dimensions[0].src = url.href;
-    return { ...p, definition };
-  });
 }
 export function createCastManager(directory: string, authFile: string) {
   const file = join(directory, 'cast-config.json');
@@ -146,74 +79,31 @@ export function createCastManager(directory: string, authFile: string) {
         if ((e as NodeJS.ErrnoException).code !== 'ENOENT')
           throw Error('Cannot read registrations');
       }
-      const request = async (method: string, path: string, body?: unknown) => {
-        const r = await fetch(c.cubeUrl + path, {
-          method,
-          headers: {
-            Authorization: 'Bearer ' + auth.token,
-            'Content-Type': 'application/json',
-          },
-          ...(body ? { body: JSON.stringify(body) } : {}),
-          signal: AbortSignal.timeout(8000),
-          redirect: 'error',
-        });
-        const p = await r.json();
-        if (!r.ok || p.error !== 0) throw Error('CUBE sync request failed');
-        return p.data;
+      if (!c.dashboardUrl || !c.cubeUrl)
+        throw Error('Configure CUBE and dashboard addresses');
+      const key = c.cubeUrl + '#dashboard';
+      const definition = createCardDefinition(c.dashboardUrl);
+      const legacyIds = Object.entries(ids)
+        .filter(([id]) => id.startsWith(c.cubeUrl + '#') && id !== key)
+        .map(([, value]) => value);
+      const registrationOptions = {
+        cubeUrl: c.cubeUrl,
+        token: auth.token,
+        definition,
+        legacyIds,
       };
-      const results = [];
-      for (const p of castDefinitions(c)) {
-        const key = c.cubeUrl + '#' + p.id,
-          id = ids[key];
-        let result;
-        const cards = id
-          ? await request('GET', '/open-api/v2/rest/ui/cards')
-          : [];
-        const existing = cards.find((card: { id: string }) => card.id === id);
-        if (existing) {
-          if (
-            existing.label !== p.definition.label ||
-            existing.cast_settings?.dimensions?.length !== 1
-          )
-            throw Error('Registered card identity changed');
-          if (
-            webSettingsFingerprint(existing.web_settings) !==
-            webSettingsFingerprint(p.definition.web_settings)
-          )
-            throw Error('Web settings differ; review before sync');
-          const desired = p.definition.cast_settings.dimensions[0].src;
-          if (existing.cast_settings?.dimensions?.[0]?.src !== desired) {
-            // Generic src updates also affect Web cards in CUBE 2.15.0.
-            // Send only CAST settings to preserve the original layouts and drawer.
-            await request(
-              'PUT',
-              '/open-api/v2/rest/ui/cards/' + encodeURIComponent(id),
-              { cast_settings: { used: '2×2', src: desired } },
-            );
-            const checked = (
-              await request('GET', '/open-api/v2/rest/ui/cards')
-            ).find((card: { id: string }) => card.id === id);
-            if (
-              !checked ||
-              webSettingsFingerprint(checked.web_settings) !==
-                webSettingsFingerprint(existing.web_settings) ||
-              checked.cast_settings?.dimensions?.[0]?.src !== desired
-            )
-              throw Error('CUBE resource verification failed');
-            result = { id, action: 'updated' };
-          } else result = { id, action: 'unchanged' };
-        } else
-          result = await registerCard({
-            cubeUrl: c.cubeUrl,
-            token: auth.token,
-            definition: p.definition,
-          });
-        ids[key] = result.id;
-        // Persist each success so a retry after a partial sync reuses these IDs.
-        await writePrivateJson(registration, ids);
-        results.push({ profile: p.id, ...result });
-      }
-      return { results };
+      const result = await registerCard({
+        ...registrationOptions,
+        cardId: ids[key],
+        recoverMissingId: true,
+      });
+      // Some hosts accept the POST but discard unsupported sizes. Read it back
+      // before reporting success, including when recovering an interrupted sync.
+      if (result.action === 'created')
+        await registerCard({ ...registrationOptions, cardId: result.id });
+      if (ids[key] !== result.id)
+        await writePrivateJson(registration, { ...ids, [key]: result.id });
+      return { results: [{ profile: 'dashboard', ...result }] };
     } finally {
       busy = false;
     }

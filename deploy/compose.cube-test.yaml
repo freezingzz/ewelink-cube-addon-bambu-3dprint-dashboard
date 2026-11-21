@@ -11,8 +11,8 @@ services:
       HOST: 0.0.0.0
       PORT: "3030"
       DATA_DIR: /app/data
-      SETUP_PUBLIC_ORIGIN: ${SETUP_PUBLIC_ORIGIN:?Set the exact CUBE LAN origin including port 3033}
-      SETUP_ACCESS_KEY: ${SETUP_ACCESS_KEY:?Set a private management key of at least 32 characters}
+      SETUP_PUBLIC_ORIGIN: ${SETUP_PUBLIC_ORIGIN:-}
+      SETUP_ACCESS_KEY: ${SETUP_ACCESS_KEY:-}
     volumes:
       - print-room-data:/app/data
     read_only: true

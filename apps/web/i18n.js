@@ -14,7 +14,7 @@ export function resolveLocale({ query, saved, browser } = {}) {
 }
 function savedLocale() { try { return localStorage.getItem(localeStorageKey); } catch { return null; } }
 const browser = typeof window !== 'undefined';
-let locale = browser ? resolveLocale({ query: cardSearchParams(location.search).get('lang'), saved: savedLocale(), browser: navigator.language }) : 'zh-CN';
+let locale = browser ? resolveLocale({ query: cardSearchParams(location.search).get('lang') || document.querySelector('meta[name="cast-language"]')?.content, saved: savedLocale(), browser: navigator.language }) : 'zh-CN';
 const listeners = new Set();
 export const getLocale = () => locale;
 export function t(key, ...values) {

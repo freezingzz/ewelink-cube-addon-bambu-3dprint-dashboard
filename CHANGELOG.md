@@ -1,5 +1,26 @@
 # Changelog / 更新说明
 
+## 0.2.2 · Docker Hub · 2026-11-20
+
+- New CUBE installs open Bambu Lab sign-in directly. A verified cloud account owns the installation. Existing explicit management keys keep their unlock flow.
+- Verified on CUBE OS 2.15.0 with the add-on running on the gateway. A real H2C supplied idle and AMS data to the CAST player after gateway authorization and card sync.
+- 已在 CUBE OS 2.15.0 上安装插件，完成网关授权与卡片同步，CAST 播放器显示了真实 H2C 待机和 AMS 数据。
+- 新安装打开「账号与设备」即可登录拓竹并选机。已绑定账号的安装继续使用同一账号，原有显式管理密钥配置继续生效。
+
+## 0.2.1 · Docker Hub · 2026-11-20
+
+- CUBE users can configure the management origin and unlock key using `management.env` in the private data volume. A blocked settings page now explains how to enable access.
+- CUBE 运行界面只有网络、端口和卷时，可在私有数据卷中配置管理地址与解锁密钥。设置页现在会提示具体操作。
+
+## 0.2.0 · Docker Hub · 2026-11-20
+
+- Docker Hub tag `0.2.0` supports Linux ARM64 and AMD64. Both containers passed local startup and restart checks.
+- Docker Hub 已发布 `0.2.0`，ARM64 和 AMD64 均已通过本地容器启动和重启验证。
+- One UI resource advertises nine CAST grids, with 2×2 as the default. The Web overview and drawer retain their original layouts.
+- One-unit AMS paging in both large layouts, with stage and three temperatures in 6×6. Preview the registered layouts with live or demo data in English and Simplified Chinese.
+- Earlier CAST URLs continue to work. Sync detects earlier registrations and lets the owner review them before migrating. On CUBE OS 2.15.0, all nine sizes displayed live H2C idle data after reopening the Pad and emulated Phone players. Tile position and AMS page selection were also checked. The setup page now explains how to resolve a card conflict after an address change.
+- 一张卡注册九档 CAST 网格，默认 2×2。6×3 优先封面，6×4 与 6×6 每页一个耗材单元，6×6 增加阶段和三项温度。已接入双语预览，旧布局可继续使用。在 CUBE OS 2.15.0 上，Pad 和模拟 Phone 两套布局保存后重新播放，九档均显示真实 H2C 待机数据。另已验证拖动位置保存和 AMS 翻页。配置页现提供换网后出现卡片冲突时的处理提示。
+
 ## 0.1.0 — 2026-11-08
 
 First public source release of Bambu 3DPrint Dashboard for eWeLink CUBE.

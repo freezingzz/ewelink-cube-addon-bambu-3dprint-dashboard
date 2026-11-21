@@ -1,3 +1,4 @@
+import { castSizes } from '../../web/cast-sizes.js';
 import http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -15,6 +16,7 @@ export interface DashboardOptions {
   handleManagement?: (req:http.IncomingMessage,res:http.ServerResponse,path:string)=>Promise<boolean>;
   initialSnapshot?: PrinterSnapshot;
   tickMs?: number;
+  getCastLanguage?: () => Promise<'en' | 'zh-CN'>;
   getCover?: () => CachedCover | null;
 }
 export function createDashboard(options: DashboardOptions = {}) {
@@ -88,6 +90,15 @@ export function createDashboard(options: DashboardOptions = {}) {
       let relative: string;
       try { relative = decodeURIComponent(pathname); } catch { return json(res, 400, { error: 'invalid_path' }); }
       if (relative.includes('\0') || relative.includes('\\')) return json(res, 400, { error: 'invalid_path' });
+      if (relative.startsWith('/cast-card/')) {
+        const grid = relative.slice('/cast-card/'.length);
+        if (!castSizes.includes(grid)) return json(res, 404, { error: 'unknown_cast_size' });
+        const locale = await options.getCastLanguage?.() ?? '';
+        const html = await readFile(resolve(webRoot, 'adaptive-cast.html'), 'utf8');
+        res.writeHead(200, { 'Content-Type': types['.html'], 'Cache-Control': 'no-store' });
+        res.end(req.method === 'HEAD' ? undefined : html.replace('CAST_LANGUAGE', locale));
+        return;
+      }
       if(relative==='/cast-config')relative='/cast-config.html';
       if(relative==='/setup') relative='/setup.html';
       if(relative==='/') relative='/admin.html';

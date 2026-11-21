@@ -40,7 +40,7 @@ test('label collisions and missing explicit ID do not overwrite or create', asyn
     if (init?.method !== 'GET') writes++;
     return success([{ id: 'other', ...createCardDefinition('http://192.168.1.51:3030') }]);
   };
-  await assert.rejects(registerCard({ cubeUrl: 'http://cube.local', token: 'test', definition, fetch: fetcher }), /同名/);
+  await assert.rejects(registerCard({ cubeUrl: 'http://cube.local', token: 'test', definition, fetch: fetcher }), { code: 'CAST_LABEL_CONFLICT' });
   await assert.rejects(registerCard({ cubeUrl: 'http://cube.local', token: 'test', definition, cardId: 'missing', fetch: fetcher }), /不存在/);
   assert.equal(writes, 0);
 });
@@ -50,7 +50,8 @@ test('explicit ID supports label-only update; changed resource URL fails closed'
   const result = await registerCard({ cubeUrl: 'http://cube.local', token: 'test', definition, cardId: 'card-1', fetch: fetcher });
   assert.equal(result.action, 'updated');
   assert.deepEqual(JSON.parse(String(calls[1].body)), { label: definition.label });
-  await assert.rejects(registerCard({ cubeUrl: 'http://cube.local', token: 'test', definition: createCardDefinition('http://192.168.1.99:3030'), cardId: 'card-1', fetch: fetcher }), /资源配置不同/);
+  await assert.rejects(registerCard({ cubeUrl: 'http://cube.local', token: 'test', definition: createCardDefinition('http://192.168.1.99:3030'), cardId: 'card-1', fetch: fetcher }), { code: 'CAST_SIZE_MISMATCH' });
+  assert.deepEqual(calls.map(call => call.method), ['GET', 'PUT', 'GET']);
 });
 test('HTTP 200 with API error, malformed payload and transport failures never report success or leak raw server text', async () => {
   for (const response of [new Response('unauthorized', { status: 401 }), success({ cards: [] }), new Response('not json'), new Response(JSON.stringify({ error: 401, message: 'server secret token' }))]) {

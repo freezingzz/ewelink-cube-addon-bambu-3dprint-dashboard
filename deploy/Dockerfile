@@ -1,12 +1,12 @@
 FROM node:24-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8
-ARG VERSION=0.1.0
+ARG VERSION=0.2.2
 ARG VCS_REF=unknown
 LABEL org.opencontainers.image.title="Bambu 3DPrint Dashboard eWeLink Cube Add-on" \
-      org.opencontainers.image.description="Read-only H2C cloud monitoring, AMS and CAST cards" \
+      org.opencontainers.image.description="Monitor Bambu Lab printers in eWeLink CUBE with live print status, AMS materials and one resizable CAST dashboard." \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.revision=$VCS_REF
 WORKDIR /app
-ENV NODE_ENV=production HOST=0.0.0.0 PORT=3030 DATA_DIR=/app/data DASHBOARD_MODE=setup
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=3030 DATA_DIR=/app/data DASHBOARD_MODE=setup DASHBOARD_ACCOUNT_LOGIN=1
 COPY package*.json ./
 COPY LICENSE NOTICE.md ./
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && mkdir -p /app/data && chown node:node /app/data && chmod 700 /app/data

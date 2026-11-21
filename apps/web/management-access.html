@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>管理页访问设置 · Management access</title>
+</head>
+<body>
+  <main>
+    <h1>此地址尚未启用管理访问</h1>
+    <p>在插件运行配置中，将 <code>SETUP_PUBLIC_ORIGIN</code> 设为浏览器地址栏中的协议、主机和端口，不含路径。使用 <code>SETUP_ACCESS_KEY</code> 设置 32–512 个字符的私密管理密钥。</p>
+    <p>如果 CUBE 只提供网络、端口和卷，请将这两个设置写入专用数据卷里的 <code>management.env</code>，每行一项，格式为 <code>名称=值</code>。将卷挂载到 <code>/app/data</code>，重新运行插件，再打开此页解锁。</p>
+    <section lang="en">
+      <h2>Management access is unavailable at this address</h2>
+      <p>Set <code>SETUP_PUBLIC_ORIGIN</code> to the browser origin (scheme, host and port, without a path). Set <code>SETUP_ACCESS_KEY</code> to a private key of 32–512 characters.</p>
+      <p>If CUBE only offers network, port and volume settings, put both settings in <code>management.env</code> in the dedicated data volume, one <code>NAME=value</code> per line. Mount the volume at <code>/app/data</code>, restart the add-on and reopen this page to unlock it.</p>
+    </section>
+  </main>
+</body>
+</html>

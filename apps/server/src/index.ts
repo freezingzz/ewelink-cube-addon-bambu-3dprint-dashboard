@@ -6,6 +6,7 @@ import { readCloudConfig } from './cloud.ts';
 import { emptySnapshot } from '../../../packages/contracts/src/index.ts';
 import { createCloudMonitor } from './cloud-monitor.ts';
 import { createSetup } from './setup.ts';
+import { readManagementConfig } from './management-config.ts';
 import { SessionStore } from './session-store.ts';
 
 const host = process.env.HOST ?? '127.0.0.1',
@@ -19,9 +20,17 @@ const coverCache = new CoverCache();
 let setup: ReturnType<typeof createSetup> | undefined;
 const initial = mode === 'demo' ? undefined : emptySnapshot('h2c-1', 'cloud');
 if (initial && mode === 'setup') initial.name = '请登录并选择打印机';
+const cast = mode === 'setup' ? createCastManager(
+      resolve(process.env.DATA_DIR ?? 'data'),
+      resolve(
+        process.env.CUBE_AUTH_FILE ??
+          `${process.env.DATA_DIR ?? 'data'}/cube-auth.json`,
+      ),
+    ) : undefined;
 const dashboard = createDashboard({
   mode: mode === 'demo' ? 'demo' : 'cloud',
   initialSnapshot: initial,
+  getCastLanguage: cast && (async () => (await cast.read()).language),
   getCover: () => coverCache.current,
   handleManagement:
     mode === 'setup'
@@ -32,20 +41,9 @@ const dashboard = createDashboard({
 const monitor = createCloudMonitor(dashboard, coverCache);
 if (mode === 'setup')
   setup = createSetup({
-    cast: createCastManager(
-      resolve(process.env.DATA_DIR ?? 'data'),
-      resolve(
-        process.env.CUBE_AUTH_FILE ??
-          `${process.env.DATA_DIR ?? 'data'}/cube-auth.json`,
-      ),
-    ),
-    remote:
-      process.env.SETUP_PUBLIC_ORIGIN || process.env.SETUP_ACCESS_KEY
-        ? {
-            origin: process.env.SETUP_PUBLIC_ORIGIN ?? '',
-            accessKey: process.env.SETUP_ACCESS_KEY ?? '',
-          }
-        : undefined,
+    cast,
+    accountDirectory: process.env.DASHBOARD_ACCOUNT_LOGIN === '1' ? resolve(process.env.DATA_DIR ?? 'data') : undefined,
+    remote: await readManagementConfig(resolve(process.env.DATA_DIR ?? 'data')),
     store: new SessionStore(resolve(process.env.DATA_DIR ?? 'data')),
     connect: (config, device) => monitor.start(config, device),
     reset: async (authenticated) => {

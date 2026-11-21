@@ -169,24 +169,19 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(base + '/cast-config?lang=en');
   await page.locator('#cast-previews iframe').first().waitFor();
-  assert.equal(await page.locator('#cast-previews iframe').count(), 3);
-  await page.locator('#cast-status').uncheck();
-  await page.locator('[data-cast-unit][value="128"]').check();
-  await page.selectOption('#cast-size', '136.375');
-  await page
-    .getByRole('button', { name: 'Save settings', exact: true })
-    .click();
-  await page.waitForFunction(
-    () =>
-      document.querySelector('#cast-message').textContent === 'Settings saved',
-  );
+  assert.equal(await page.locator('#cast-previews iframe').count(), 1);
+  assert.equal(await page.locator('#cast-size option').count(), 9);
+  await page.selectOption('#cast-size', '6x6');
+  await page.selectOption('#cast-host', 'desktop16');
+  await page.selectOption('#cast-language', 'en');
+  await page.frameLocator('#cast-frame').locator('.conditions').waitFor();
+  assert.equal((await page.locator('#cast-frame').boundingBox()).width, 457.125);
+  await page.getByRole('button', {name: 'Save settings', exact:true}).click();
+  await page.waitForFunction(() => document.querySelector('#cast-message').textContent === 'Settings saved');
   await page.reload();
-  await page.locator('#cast-form').waitFor();
-  assert.equal(await page.locator('#cast-status').isChecked(), false);
-  assert.equal(
-    await page.locator('[data-cast-unit][value="128"]').isChecked(),
-    true,
-  );
+  await page.waitForFunction(() => !document.querySelector('#cast-management').disabled);
+  assert.equal(await page.inputValue('#cast-language'), 'en');
+  await page.selectOption('#cast-size', '6x6');
   await page.screenshot({
     path: 'artifacts/cast/config-en.png',
     fullPage: true,

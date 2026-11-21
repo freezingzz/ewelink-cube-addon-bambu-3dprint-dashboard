@@ -25,7 +25,7 @@ export function usernameFromToken(token: string): string | null {
   return null;
 }
 export function cloudApiBase(region: CloudConfig['region']) { return region === 'CN' ? 'https://api.bambulab.cn' : 'https://api.bambulab.com'; }
-export async function resolveCloudUsername(config: CloudConfig, fetcher: typeof fetch = fetch): Promise<string> {
+export async function resolveCloudUsername(config: Pick<CloudConfig, 'region' | 'token' | 'username'> & { serial?: string }, fetcher: typeof fetch = fetch): Promise<string> {
   const known = config.username ?? usernameFromToken(config.token);
   if (known) return known;
   try {

@@ -12,10 +12,11 @@ import { emptySnapshot } from '../packages/contracts/src/index.ts';
 import { applyReport } from '../packages/printer-bambu/src/parser.ts';
 
 const dir=await mkdtemp(join(tmpdir(),'cube-login-ui-'));
-const cloud=new CloudAuth(async url=>String(url).endsWith('/bind')?Response.json({devices:[{dev_id:'SYNTH12345',name:'合成测试 H2C',dev_product_name:'H2C',online:true}]}):Response.json({accessToken:'SYNTHETIC_LOGIN_TOKEN_FOR_TEST_ONLY'}));
+const accountLogin=process.argv.includes('--account-login');
+const cloud=new CloudAuth(async url=>String(url).endsWith('/my/preference')?Response.json({uidStr:'12345678'}):String(url).endsWith('/bind')?Response.json({devices:[{dev_id:'SYNTH12345',name:'合成测试 H2C',dev_product_name:'H2C',online:true}]}):Response.json({accessToken:'SYNTHETIC_LOGIN_TOKEN_FOR_TEST_ONLY'}));
 let manager;
 const app=createDashboard({mode:'cloud',initialSnapshot:emptySnapshot('h2c-1','synthetic'),handleManagement:(req,res,path)=>manager.handle(req,res,path)});
-manager=createSetup({store:new SessionStore(dir),auth:cloud,reset:async()=>app.update(emptySnapshot('h2c-1','synthetic')),connect:async()=>{
+manager=createSetup({accountDirectory:accountLogin?dir:undefined,store:new SessionStore(dir),auth:cloud,reset:async()=>app.update(emptySnapshot('h2c-1','synthetic')),connect:async()=>{
   // Deliberately preserve synthetic provenance: this is a login/UI test, not a physical printer.
   const next=applyReport(emptySnapshot('h2c-1','synthetic'),{print:{gcode_state:'RUNNING',subtask_name:'合成端到端任务',mc_percent:57,mc_remaining_time:80,nozzle_temper:210,bed_temper:55,ams:{ams:[{id:'0',tray:[{id:'0',tray_type:'PLA',tray_color:'12AA55FF'}]}]}}});
   next.name='合成测试 H2C';app.update(next);

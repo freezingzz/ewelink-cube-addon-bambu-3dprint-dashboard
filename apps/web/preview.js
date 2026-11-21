@@ -54,7 +54,7 @@ export function mountPreview(stage, layout) {
   mounted.frame.style.width = `${width}px`; mounted.frame.style.height = `${height}px`;
   mounted.frame.style.transform = `scale(${zoom})`;
   mounted.space.style.width = `${width * zoom}px`; mounted.space.style.height = `${height * zoom}px`;
-  const src = new URL('/card', location.origin); src.searchParams.set('layout', layout); src.searchParams.set('lang', getLocale());
+  const src = new URL(layout === 'cast' ? '/cast-card/2x2' : '/card', location.origin); if (layout !== 'cast') src.searchParams.set('layout', layout); src.searchParams.set('lang', getLocale());
   if (params.has('printerId')) src.searchParams.set('printerId', params.get('printerId'));
   if (mounted.frame.src !== src.href) mounted.frame.src = src.href;
 }

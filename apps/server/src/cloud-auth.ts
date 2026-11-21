@@ -1,5 +1,5 @@
 /** Cloud authentication protocol reference: cptkirki/PrintSphere 32ad5aeb, FNCL v1.1; see NOTICE. */
-import { cloudApiBase, type CloudConfig } from './cloud.ts';
+import { cloudApiBase, resolveCloudUsername, type CloudConfig } from './cloud.ts';
 export type Region = CloudConfig['region'];
 export interface CloudSession { region: Region; token: string; expiresAt: string | null; selected?: Device }
 export interface Device { id: string; serial: string; name: string; model: string; online: boolean | null }
@@ -54,6 +54,9 @@ export class CloudAuth {
       for(const cookie of response.headers.getSetCookie()) { const token=/(?:^|;\s*)token=([^;]+)/.exec(cookie)?.[1]; if(token) return this.session(challenge.region,response,{accessToken:token,expiresIn:3600}); }
     }
     try { return this.session(challenge.region,response,data); } catch { throw new CloudError('CLOUD_CODE_REJECTED'); }
+  }
+  async identity(session: CloudSession) {
+    return resolveCloudUsername(session, this.fetcher);
   }
   async devices(session: CloudSession): Promise<Omit<Device,'id'>[]> {
     const {response,data}=await this.request(session.region,'/v1/iot-service/api/user/bind',undefined,session.token);

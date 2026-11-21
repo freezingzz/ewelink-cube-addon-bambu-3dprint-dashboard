@@ -1,9 +1,10 @@
+import { castSizes } from '../apps/web/cast-sizes.js';
 // Temporary LAN card-only gateway. Login and mutation routes remain loopback-only.
 import http from 'node:http';
 import {pathToFileURL} from 'node:url';
-const assets = new Set(['cast-model.js','cast-cards.js','cast-cards.css','events.js','cube-url.js','app.js','i18n.js','messages.js','display.js','model.js','admin-shell.js','icons.js','tiles.js','preview.js','preview-sizes.js','theme.css','styles.css','tiles.css','admin-shell.css','cube-surfaces.css','favicon.ico']);
+const assets = new Set(['adaptive-cast.js','adaptive-cast.css','cast-sizes.js','cast-model.js','cast-cards.js','cast-cards.css','events.js','cube-url.js','app.js','i18n.js','messages.js','display.js','model.js','admin-shell.js','icons.js','tiles.js','preview.js','preview-sizes.js','theme.css','styles.css','tiles.css','admin-shell.css','cube-surfaces.css','favicon.ico']);
 export function allowedCardPath(path) {
- return path==='/card'||path==='/card/'||assets.has(path.slice(1))||path==='/api/v1/printers'||path==='/api/v1/events'||/^\/api\/v1\/printers\/[^/]+\/(snapshot|cover)$/.test(path)||path==='/assets/demo-cover.svg';
+ return (path.startsWith('/cast-card/') && castSizes.includes(path.slice(11)))||path==='/card'||path==='/card/'||assets.has(path.slice(1))||path==='/api/v1/printers'||path==='/api/v1/events'||/^\/api\/v1\/printers\/[^/]+\/(snapshot|cover)$/.test(path)||path==='/assets/demo-cover.svg';
 }
 export function createCardRelay({host='127.0.0.1',port=3031}={}) {
  return http.createServer((req,res)=>{

@@ -13,12 +13,15 @@ import {
   type Device,
   type Challenge,
 } from './cloud-auth.ts';
+import { BrowserChallenges, browserSession, validBrowserSession, isLanHost, verifyOwner } from './account-access.ts';
+import { CastRegistrationError } from '../../../packages/cube-client/src/index.ts';
 import { SessionStore } from './session-store.ts';
 import { readFile } from 'node:fs/promises';
 import type { CloudConfig } from './cloud.ts';
 export interface SetupOptions {
   store: SessionStore;
   auth?: CloudAuth;
+  accountDirectory?: string;
   remote?: { origin: string; accessKey: string };
   cast?: {
     read: () => Promise<unknown>;
@@ -42,9 +45,9 @@ function managementPageHeaders(res: ServerResponse) {
 export function createSetup(options: SetupOptions) {
   const remote = options.remote;
   if (remote) {
-    const u = new URL(remote.origin);
+    const u = URL.parse(remote.origin);
     if (
-      !['http:', 'https:'].includes(u.protocol) ||
+      !u || !['http:', 'https:'].includes(u.protocol) ||
       u.origin !== remote.origin ||
       u.username ||
       u.password ||
@@ -60,8 +63,10 @@ export function createSetup(options: SetupOptions) {
     req.headers.origin ===
       (remoteHost(req) ? remote!.origin : `http://${req.headers.host}`) &&
     req.headers['x-setup-request'] === '1';
-  const auth = options.auth ?? new CloudAuth(),
-    key = randomBytes(32).toString('hex');
+  const auth = options.auth ?? new CloudAuth();
+  const accountDirectory = remote ? undefined : options.accountDirectory;
+  const guestChallenges = new BrowserChallenges();
+  let key = randomBytes(32).toString('hex');
   let session: CloudSession | null = null,
     devices: Device[] = [],
     challenge: Challenge | null = null,
@@ -124,6 +129,7 @@ export function createSetup(options: SetupOptions) {
     }
   };
   const authorized = (req: IncomingMessage) => {
+    if (accountDirectory) return validBrowserSession(req, key);
     const supplied = /(?:^|;\s*)cube_setup=([a-f0-9]{64})(?:;|$)/.exec(
       req.headers.cookie ?? '',
     )?.[1];
@@ -140,17 +146,25 @@ export function createSetup(options: SetupOptions) {
     (await auth.devices(next)).map((d) => ({ ...d, id: randomUUID() }));
   async function accept(next: CloudSession) {
     const found = await loadDevices(next);
+    // Only a token accepted by the cloud device endpoint can claim or resume management.
+    if (accountDirectory) {
+      await verifyOwner(accountDirectory, next, (candidate) => auth.identity(candidate));
+      const selected = found.find(device => device.serial === session?.selected?.serial);
+      if (selected) next = { ...next, selected };
+    }
     await options.store.save(next);
     session = next;
     devices = found;
     setChallenge(null);
     lastError = null;
-    await options.reset(true);
+    if (next.selected) {
+      await options.connect({ region: next.region, token: next.token, serial: next.selected.serial }, next.selected);
+    } else await options.reset(true);
   }
   async function restore() {
     busy = true;
     try {
-      session = await options.store.load();
+      session = await options.store.load(!!accountDirectory);
       if (session?.selected)
         await options.connect(
           {
@@ -191,7 +205,14 @@ export function createSetup(options: SetupOptions) {
     path: string,
   ): Promise<boolean> {
     // Remote installations must unlock first; only loopback gets a bootstrap cookie.
-    const admitted = remoteHost(req) || localHost(req);
+    const accountHost = !!accountDirectory && isLanHost(req.headers.host);
+    const localBootstrap = !accountDirectory && localHost(req) && !remoteHost(req);
+    const admitted = accountHost || remoteHost(req) || localBootstrap;
+    const guest = accountHost && !authorized(req);
+    const pending = guest ? guestChallenges.get(req) : challenge;
+    const guestStatus = (current = guestChallenges.get(req)) => {
+      return { authenticated: false, selected: null, devices: [], diagnostics: {}, challenge: current?.kind ?? null, region: current?.region ?? null };
+    };
     const cookie = () =>
       `cube_setup=${key}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${remoteHost(req) && remote!.origin.startsWith('https:') ? '; Secure' : ''}`;
     if (path === '/api/v1/setup/unlock') {
@@ -216,18 +237,25 @@ export function createSetup(options: SetupOptions) {
       }
       return true;
     }
+    const settingsPage = ['/setup', '/setup.html', '/cast-config', '/cast-config.html'].includes(path);
+    if (settingsPage && !admitted) {
+      managementPageHeaders(res);
+      if (req.method === 'GET' && req.headers.accept?.includes('text/html')) {
+        res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(await readFile(new URL('../../web/management-access.html', import.meta.url)));
+      } else {
+        json(res, 403, { error: 'LOCAL_SETUP_ONLY' });
+      }
+      return true;
+    }
     if (path === '/cast-config' || path === '/cast-config.html') {
       managementPageHeaders(res);
-      if (!admitted) {
-        json(res, 403, { error: 'LOCAL_SETUP_ONLY' });
-        return true;
-      }
       if (!['GET', 'HEAD'].includes(req.method ?? '')) {
         json(res, 405, { error: 'METHOD_NOT_ALLOWED' });
         return true;
       }
-      if (!authorized(req)) {
-        if (localHost(req) && !remoteHost(req))
+      if (!accountHost && !authorized(req)) {
+        if (localBootstrap)
           res.setHeader('Set-Cookie', cookie());
         else {
           res.writeHead(302, { Location: '/setup' });
@@ -237,15 +265,11 @@ export function createSetup(options: SetupOptions) {
       }
     }
     if (path === '/setup' || path === '/setup.html') {
-      if (!admitted) {
-        json(res, 403, { error: 'LOCAL_SETUP_ONLY' });
-        return true;
-      }
       if (req.method !== 'GET' && req.method !== 'HEAD') {
         json(res, 405, { error: 'METHOD_NOT_ALLOWED' });
         return true;
       }
-      if (localHost(req) && !remoteHost(req))
+      if (localBootstrap)
         res.setHeader('Set-Cookie', cookie());
       managementPageHeaders(res);
       if (remoteHost(req) && !authorized(req)) {
@@ -258,8 +282,18 @@ export function createSetup(options: SetupOptions) {
       return false;
     }
     if (!path.startsWith('/api/v1/setup/')) return false;
-    if (!admitted || !authorized(req)) {
-      json(res, 403, { error: 'OPEN_LOCAL_SETUP' });
+    if (guest && path === '/api/v1/setup/status' && req.method === 'GET') {
+      json(res, 200, guestStatus());
+      return true;
+    }
+    if (guest && path === '/api/v1/setup/logout' && req.method === 'POST' && sameOrigin(req)) {
+      guestChallenges.clear(req);
+      json(res, 200, guestStatus());
+      return true;
+    }
+    const loginAction = ['/api/v1/setup/login', '/api/v1/setup/code/send', '/api/v1/setup/code/verify', '/api/v1/setup/token'].includes(path);
+    if (!admitted || (!authorized(req) && !(guest && loginAction))) {
+      json(res, 403, { error: guest ? 'ACCOUNT_SIGN_IN_REQUIRED' : 'OPEN_LOCAL_SETUP' });
       return true;
     }
     if (req.method === 'GET' && path === '/api/v1/setup/cast' && options.cast) {
@@ -289,6 +323,21 @@ export function createSetup(options: SetupOptions) {
     busy = true;
     try {
       const input = await body(req);
+      let issuedChallenge = pending;
+      let signedIn = false;
+      const rememberChallenge = (next: Challenge) => {
+        if (guest) guestChallenges.set(req, res, next);
+        else setChallenge(next);
+        issuedChallenge = next;
+      };
+      const finishLogin = async (next: CloudSession) => {
+        await accept(next);
+        if (guest) {
+          guestChallenges.clear(req);
+          res.setHeader('X-Print-Room-Session', browserSession(key, req.headers.host!));
+          signedIn = true;
+        }
+      };
       if (options.cast && path === '/api/v1/setup/cast/save') {
         json(res, 200, await options.cast.save(input));
         return true;
@@ -309,21 +358,21 @@ export function createSetup(options: SetupOptions) {
           throw new CloudError('PASSWORD_REQUIRED');
         const result = await auth.login(region, account, input.password);
         if ('kind' in result) {
-          setChallenge(result);
-          lastError = null;
-        } else await accept(result);
+          rememberChallenge(result);
+          if (!guest) lastError = null;
+        } else await finishLogin(result);
       } else if (path === '/api/v1/setup/code/send') {
         limit('send-code', 60000);
-        const region = regionOf(input.region ?? challenge?.region),
-          account = auth.account(input.account ?? challenge?.account);
-        setChallenge(await auth.sendCode(region, account));
+        const region = regionOf(input.region ?? pending?.region),
+          account = auth.account(input.account ?? pending?.account);
+        rememberChallenge(await auth.sendCode(region, account));
         lastError = null;
       } else if (path === '/api/v1/setup/code/verify') {
         limit('verify');
-        if (!challenge) throw new CloudError('CHALLENGE_REQUIRED');
+        if (!pending) throw new CloudError('CHALLENGE_REQUIRED');
         if (typeof input.code !== 'string')
           throw new CloudError('CODE_REQUIRED');
-        await accept(await auth.verify(challenge, input.code));
+        await finishLogin(await auth.verify(pending, input.code));
       } else if (path === '/api/v1/setup/token') {
         limit('token');
         const region = regionOf(input.region);
@@ -334,7 +383,7 @@ export function createSetup(options: SetupOptions) {
           /[\r\n]/.test(input.token)
         )
           throw new CloudError('TOKEN_REQUIRED');
-        await accept({ region, token: input.token, expiresAt: null });
+        await finishLogin({ region, token: input.token, expiresAt: null });
       } else if (path === '/api/v1/setup/devices') {
         if (!session) throw new CloudError('CLOUD_AUTH_REQUIRED');
         limit('devices');
@@ -354,6 +403,10 @@ export function createSetup(options: SetupOptions) {
         );
       } else if (path === '/api/v1/setup/logout') {
         await options.store.clear();
+        if (accountHost) {
+          key = randomBytes(32).toString('hex');
+          res.setHeader('X-Print-Room-Session', 'signed-out');
+        }
         session = null;
         devices = [];
         setChallenge(null);
@@ -364,10 +417,13 @@ export function createSetup(options: SetupOptions) {
         return true;
       }
       busy = false;
-      json(res, 200, status());
+      if (guest && !signedIn) {
+        json(res, 200, guestStatus(issuedChallenge));
+      } else json(res, 200, status());
     } catch (error) {
-      lastError = error instanceof CloudError ? error.message : 'SETUP_FAILED';
-      json(res, lastError === 'TRY_LATER' ? 429 : 400, { error: lastError });
+      const code = error instanceof CastRegistrationError ? error.code : error instanceof CloudError ? error.message : 'SETUP_FAILED';
+      if (!guest) lastError = code;
+      json(res, code === 'TRY_LATER' ? 429 : 400, { error: code });
     } finally {
       busy = false;
     }

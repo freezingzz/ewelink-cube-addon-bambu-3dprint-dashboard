@@ -4,13 +4,12 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
-  castDefinitions,
   createCastManager,
   defaultCastConfig,
   validateCastConfig,
 } from '../apps/server/src/cast-config.ts';
 import { createCardDefinition } from '../packages/cube-client/src/index.ts';
-test('CAST profiles persist, deduplicate and reject malformed or unsafe configuration', async () => {
+test('CAST config reads 0.1 files and persists only current fields', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'cast-config-'));
   try {
     const m = createCastManager(dir, join(dir, 'no-token'));
@@ -21,11 +20,15 @@ test('CAST profiles persist, deduplicate and reject malformed or unsafe configur
       cubeUrl: 'http://192.0.2.10',
       dashboardUrl: 'http://192.0.2.20:3032',
     };
-    await m.save(c);
-    assert.deepEqual((await m.read()).amsUnits, ['active', '128']);
-    assert.throws(() =>
-      validateCastConfig({ ...c, amsUnits: ['../../setup'] }),
-    );
+    await writeFile(join(dir, 'cast-config.json'), JSON.stringify(c));
+    const expected = {
+      ...defaultCastConfig,
+      cubeUrl: c.cubeUrl,
+      dashboardUrl: c.dashboardUrl,
+    };
+    assert.deepEqual(await m.read(), expected);
+    assert.deepEqual(await m.save(c), expected);
+    assert.throws(() => validateCastConfig({ ...c, language: 'fr' }));
     assert.throws(() =>
       validateCastConfig({ ...c, dashboardUrl: 'http://127.0.0.1:3034' }),
     );
@@ -36,37 +39,37 @@ test('CAST profiles persist, deduplicate and reject malformed or unsafe configur
     await rm(dir, { recursive: true, force: true });
   }
 });
-test('functional CAST definitions keep every web dimension and drawer on the original comprehensive views', () => {
-  const c = {
-    ...defaultCastConfig,
-    cubeUrl: 'http://192.0.2.10',
-    dashboardUrl: 'http://192.0.2.20:3032',
-  };
-  const profiles = castDefinitions(c),
-    original = createCardDefinition(c.dashboardUrl);
-  assert.equal(profiles.length, 3);
-  for (const p of profiles) {
-    assert.deepEqual(p.definition.web_settings, original.web_settings);
-    assert.equal(
-      new URL(p.definition.cast_settings.dimensions[0].src).searchParams.get(
-        'view',
-      ),
-      p.kind,
-    );
-  }
-  assert.equal(profiles[1].unit, 'active');
+test('one resource advertises all CAST sizes and the original CUBE overview and drawer', () => {
+  const url = 'http://192.0.2.20:3032';
+  const card = createCardDefinition(url);
+  assert.deepEqual(card.cast_settings.default, '2×2');
+  assert.deepEqual(
+    card.cast_settings.dimensions.map((d) => [d.size, d.src]),
+    ['2x2', '4x1', '4x2', '4x3', '4x4', '6x2', '6x3', '6x4', '6x6'].map(
+      (size) => [size.replace('x', '×'), url + '/cast-card/' + size],
+    ),
+  );
+  assert.deepEqual(card.web_settings, {
+    default: '2×1',
+    dimensions: [
+      { size: '1×1', src: url + '/card?layout=compact' },
+      { size: '2×1', src: url + '/card?layout=wide' },
+    ],
+    drawer_component: { src: url + '/card?layout=detail' },
+  });
 });
 import http from 'node:http';
 import { writeFile, readFile } from 'node:fs/promises';
-test('sync preserves original web cards, keeps IDs across language changes and only updates CAST URLs', async () => {
+test('sync is idempotent across retries, preserves unrelated cards, detects legacy and truncated resources', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'cast-sync-')),
     dashboardUrl = 'http://192.0.2.20:3032',
     token = 'SYNTHETIC_CUBE_TOKEN';
   const original = {
       id: 'original',
-      ...createCardDefinition(dashboardUrl, 'Original'),
+      ...createCardDefinition('http://another-dashboard.example', 'Original'),
     },
     cards: any[] = [structuredClone(original)];
+  let truncateCreation = false;
   let puts = 0,
     deletes = 0;
   const cube = http.createServer(async (req, res) => {
@@ -80,6 +83,11 @@ test('sync preserves original web cards, keeps IDs across language changes and o
       const body = JSON.parse(text);
       if (req.method === 'POST') {
         const card = { id: 'card-' + cards.length, ...body };
+        if (truncateCreation)
+          card.cast_settings.dimensions = card.cast_settings.dimensions.slice(
+            0,
+            1,
+          );
         cards.push(card);
         data = { id: card.id };
       } else if (req.method === 'PUT') {
@@ -106,35 +114,53 @@ test('sync preserves original web cards, keeps IDs across language changes and o
   const manager = createCastManager(dir, file);
   try {
     await manager.save({ ...defaultCastConfig, cubeUrl, dashboardUrl });
-    const first = await manager.sync();
-    assert.equal(first.results.length, 3);
-    assert.equal(cards.length, 4);
+    truncateCreation = true;
+    await assert.rejects(manager.sync(), { code: 'CAST_SIZE_MISMATCH' });
+    assert.equal(cards.length, 2);
+    await assert.rejects(manager.sync(), { code: 'CAST_SIZE_MISMATCH' });
+    assert.equal(cards.length, 2);
+    cards.pop();
+    truncateCreation = false;
+    const inFlight = manager.sync();
+    await assert.rejects(manager.sync(), /busy/);
+    const first = await inFlight;
+    assert.equal(first.results.length, 1);
+    assert.equal(cards.length, 2);
+    assert.equal(first.results[0].action, 'created');
+    cards[1].cast_settings.dimensions.reverse();
+    cards[1].cast_settings.default = '2x2';
+    for (const d of cards[1].cast_settings.dimensions) d.size = d.size.replace('×', 'x');
     const second = await manager.sync();
-    assert.ok(second.results.every((r) => r.action === 'unchanged'));
-    assert.equal(cards.length, 4);
+    assert.equal(second.results[0].action, 'unchanged');
     await manager.save({ ...(await manager.read()), language: 'en' });
-    const changed = await manager.sync();
-    assert.ok(changed.results.every((r) => r.action === 'updated'));
-    assert.deepEqual(
-      changed.results.map((r) => r.id),
-      first.results.map((r) => r.id),
-    );
-    assert.equal(puts, 3);
+    assert.equal((await manager.sync()).results[0].id, first.results[0].id);
+    assert.equal(puts, 0);
     assert.deepEqual(cards[0], original);
-    for (const card of cards.slice(1)) {
-      assert.deepEqual(
-        card.web_settings,
-        createCardDefinition(dashboardUrl).web_settings,
-      );
-      assert.equal(
-        new URL(card.cast_settings.dimensions[0].src).searchParams.get('lang'),
-        'en',
-      );
-    }
-    await manager.save({ ...(await manager.read()), status: false });
-    await manager.sync();
+    cards[1].cast_settings.dimensions.pop();
+    await assert.rejects(manager.sync(), { code: 'CAST_SIZE_MISMATCH' });
+    assert.equal(cards.length, 2);
+    cards.pop();
+    cards.push({
+      id: 'old',
+      ...createCardDefinition(dashboardUrl, 'Print Room · Print status'),
+      cast_settings: {
+        default: '2×2',
+        dimensions: [
+          { size: '2×2', src: dashboardUrl + '/card?layout=cast&view=status' },
+        ],
+      },
+    });
+    await assert.rejects(manager.sync(), { code: 'CAST_LEGACY_CARDS' });
+    assert.equal(cards.length, 2);
+    cards.pop();
+    assert.equal((await manager.sync()).results[0].action, 'created');
+    assert.equal(cards.length, 2);
+    await rm(join(dir, 'cast-registration.json'));
+    cards[1].label = 'User label';
+    const restarted = createCastManager(dir, file);
+    assert.equal((await restarted.sync()).results[0].action, 'unchanged');
+    assert.equal(cards.length, 2);
     assert.equal(deletes, 0);
-    assert.equal(cards.length, 4);
     assert.deepEqual(await manager.authorize(), { authorized: true });
     assert.ok(
       !(await readFile(join(dir, 'cast-config.json'), 'utf8')).includes(token),

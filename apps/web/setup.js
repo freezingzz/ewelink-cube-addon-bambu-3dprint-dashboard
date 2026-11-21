@@ -1,14 +1,15 @@
 import { t, getLocale, onLocaleChange, bindStatic, sourceKey } from './i18n.js';
+import { managementFetch } from './management-fetch.js';
 import { mountShell } from './admin-shell.js';
 bindStatic();
 mountShell('setup');
 const $=id=>document.getElementById(id);
-const errorLabels=()=>({REGION_REQUIRED:t("请选择账号地区。"),ACCOUNT_REQUIRED:t("请输入正确的邮箱或手机号。"),PASSWORD_REQUIRED:t("请输入密码，或选择验证码登录。"),CODE_REQUIRED:t("请输入有效验证码。"),TOKEN_REQUIRED:t("请输入有效登录令牌。"),CLOUD_LOGIN_REJECTED:t("登录未通过，请检查账号、密码和地区。若云端要求额外校验，可尝试验证码或已有令牌。"),CLOUD_CODE_REJECTED:t("验证码未通过，请检查或重新发送。"),CLOUD_CODE_SEND_FAILED:t("验证码发送失败，请稍后重试并检查账号地区。"),CLOUD_NETWORK_ERROR:t("无法连接拓竹云端，请检查网络。"),CLOUD_INVALID_RESPONSE:t("云端返回了无法识别的响应，请稍后重试。"),CLOUD_RATE_LIMITED:t("云端请求过于频繁，请稍后重试。"),CLOUD_UNAVAILABLE:t("拓竹云端暂时不可用，请稍后重试。"),CLOUD_AUTH_REQUIRED:t("登录已过期或令牌无效，请重新登录。"),CLOUD_DEVICE_LOOKUP_FAILED:t("未能取得设备列表，请重试。"),DEVICE_REQUIRED:t("请从本次设备列表中选择打印机。"),CHALLENGE_EXPIRED:t("验证码会话已过期，请重新登录。"),CHALLENGE_REQUIRED:t("请先发送验证码或开始登录。"),TRY_LATER:t("请稍后重试；验证码发送间隔至少60秒。"),SETUP_BUSY:t("正在处理上一次操作，请稍候。"),OPEN_LOCAL_SETUP:t("请从本机重新打开设置页面。"),SAME_ORIGIN_REQUIRED:t("请刷新本机设置页后再试。"),SETUP_FAILED:t("操作未完成，请检查本地数据卷权限后重试。"),SESSION_RESTORE_FAILED:t("本机会话恢复未完成，请重新登录。")});
+const errorLabels=()=>({OWNER_MIGRATION_REQUIRED:t("此数据卷保留了旧版 CUBE 授权。请使用原管理配置，或为新安装选择一个空卷。"),OWNER_ACCOUNT_REQUIRED:t("请使用最初绑定此插件的拓竹账号登录。"),REGION_REQUIRED:t("请选择账号地区。"),ACCOUNT_REQUIRED:t("请输入正确的邮箱或手机号。"),PASSWORD_REQUIRED:t("请输入密码，或选择验证码登录。"),CODE_REQUIRED:t("请输入有效验证码。"),TOKEN_REQUIRED:t("请输入有效登录令牌。"),CLOUD_LOGIN_REJECTED:t("登录未通过，请检查账号、密码和地区。若云端要求额外校验，可尝试验证码或已有令牌。"),CLOUD_CODE_REJECTED:t("验证码未通过，请检查或重新发送。"),CLOUD_CODE_SEND_FAILED:t("验证码发送失败，请稍后重试并检查账号地区。"),CLOUD_NETWORK_ERROR:t("无法连接拓竹云端，请检查网络。"),CLOUD_INVALID_RESPONSE:t("云端返回了无法识别的响应，请稍后重试。"),CLOUD_RATE_LIMITED:t("云端请求过于频繁，请稍后重试。"),CLOUD_UNAVAILABLE:t("拓竹云端暂时不可用，请稍后重试。"),CLOUD_AUTH_REQUIRED:t("登录已过期或令牌无效，请重新登录。"),CLOUD_DEVICE_LOOKUP_FAILED:t("未能取得设备列表，请重试。"),DEVICE_REQUIRED:t("请从本次设备列表中选择打印机。"),CHALLENGE_EXPIRED:t("验证码会话已过期，请重新登录。"),CHALLENGE_REQUIRED:t("请先发送验证码或开始登录。"),TRY_LATER:t("请稍后重试；验证码发送间隔至少60秒。"),SETUP_BUSY:t("正在处理上一次操作，请稍候。"),OPEN_LOCAL_SETUP:t("请从本机重新打开设置页面。"),SAME_ORIGIN_REQUIRED:t("请刷新本机设置页后再试。"),SETUP_FAILED:t("操作未完成，请检查本地数据卷权限后重试。"),SESSION_RESTORE_FAILED:t("本机会话恢复未完成，请重新登录。")});
 let busy=false,latest=null,deviceKey='',messageKey='',messageError=false;
 const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 function message(text,error=false){messageKey=sourceKey(text);messageError=error;$('message').textContent=t(messageKey);$('message').classList.toggle('error',error);}
 async function api(path,body){
-  let r;try{r=await fetch('/api/v1/setup/'+path,{cache:'no-store',...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-Setup-Request':'1'},body:JSON.stringify(body)})});}catch{throw new Error('CLOUD_NETWORK_ERROR');}
+  let r;try{r=await managementFetch('/api/v1/setup/'+path,{cache:'no-store',...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-Setup-Request':'1'},body:JSON.stringify(body)})});}catch{throw new Error('CLOUD_NETWORK_ERROR');}
   const data=await r.json();if(!r.ok)throw new Error(data.error||'SETUP_FAILED');return data;
 }
 function fields(){const region=$('region').value,account=$('account').value.trim();if(!region)throw new Error('REGION_REQUIRED');if(!account)throw new Error('ACCOUNT_REQUIRED');return {region,account};}

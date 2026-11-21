@@ -1,11 +1,10 @@
 # Docker deployment / Docker 部署
 
-For CUBE Add-on settings, remote management access and the published test image,
+For CUBE Add-on settings, remote management access and the published image,
 see the bilingual [installation guide](../docs/INSTALL.md).
 
-GitHub source version: **0.1.0**. The published Docker Hub tag
-`byteandscrew/ewelink-cube-addon-bambu-3dprint-dashboard:0.1.0-test.1`
-is an earlier test build. Building the source below does not publish a new image.
+Source and Docker image version **0.2.2**. The image is available as
+`byteandscrew/ewelink-cube-addon-bambu-3dprint-dashboard:0.2.2`. Building the source below does not publish a new image.
 
 ## Build and run locally
 
@@ -20,17 +19,15 @@ The service defaults to setup mode with a new named data volume. Passwords and
 verification codes are not persisted; session tokens remain in the data volume.
 The default local bind address does not expose management to your LAN.
 
-To expose the service on another host, configure the exact browser origin and
-a private management key as described in the installation guide. Use
-`compose.cube-test.yaml` with `PRINT_ROOM_IMAGE`, `SETUP_PUBLIC_ORIGIN` and
-`SETUP_ACCESS_KEY` set locally when testing an already built image.
+The image opens Bambu sign-in directly on a trusted LAN. Installations using an explicit management key can keep their settings as described in the installation guide. Use
+`compose.cube-test.yaml` with `PRINT_ROOM_IMAGE` set locally when testing an already built image.
 
 ## Build a versioned image
 
 ```sh
-docker build --build-arg VERSION=0.1.0 \
+docker build --build-arg VERSION=0.2.2 \
   --build-arg VCS_REF="$(git rev-parse HEAD)" \
-  -f deploy/Dockerfile -t bambu-cube-dashboard:0.1.0 .
+  -f deploy/Dockerfile -t bambu-cube-dashboard:0.2.2 .
 ```
 
 The image runs as a non-root user, stores state at `/app/data`, and needs no
@@ -45,8 +42,8 @@ development helpers; their unit tests use synthetic data.
 ## 中文
 
 CUBE Add-on参数、远程管理和测试镜像使用方式见[安装说明](../docs/INSTALL.md)。
-源码版本为0.1.0；Docker Hub现有0.1.0-test.1是较早构建，以上命令只做本地构建，不上传镜像。
+Docker Hub 镜像标签为 0.2.2。上面的命令可在本机重新构建。
 
 在项目根目录执行Compose命令后，打开本机3031端口的setup页面登录并选机。
-默认只监听回环地址，状态保存在独立数据卷中；局域网访问须按安装说明配置精确访问地址和私密管理密钥。
+本地 Compose 默认只监听回环地址。CUBE 中的镜像默认支持局域网直接登录拓竹，状态保存在独立数据卷中。
 不要将密码、验证码、令牌或真实环境配置提交到仓库。

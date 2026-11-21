@@ -31,7 +31,7 @@ const markdown = new Marked({
     },
   },
 });
-// Only public documentation and chosen synthetic images are accessible here.
+// Only public documentation and selected screenshots are accessible here.
 const documents = new Set(['README.md', 'NOTICE.md', 'CHANGELOG.md', 'docs/INSTALL.md']);
 const rawFiles = new Set([
   'LICENSE',
@@ -39,6 +39,12 @@ const rawFiles = new Set([
   'packages/printer-bambu/UPSTREAM_LICENSE',
 ]);
 const images = new Set([
+  'cast-live-6x6-022-en.png',
+  'cube-overview-022.png',
+  'cast-player-6x4-022.png',
+  'cast-dashboard-020-idle.png',
+  'cast-dashboard-6x6-en.png',
+  'cast-dashboard-6x6-zh.png',
   'cast-status-en.png',
   'cast-materials-en.png',
   'cast-job-en.png',
